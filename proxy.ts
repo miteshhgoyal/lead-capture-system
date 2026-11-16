@@ -24,7 +24,7 @@ export function proxy(request: NextRequest) {
 
   // 2. Wildcard Subdomain Rewriting (optional, enabled by env flag)
   const enableSubdomains = process.env.ENABLE_SUBDOMAINS === "true";
-  const rootDomain = process.env.ROOT_DOMAIN; // e.g. "onestockacademy.com" or "localhost:3000"
+  const rootDomain = process.env.ROOT_DOMAIN; // e.g. "freecourselink.com" or "localhost:3000"
 
   if (enableSubdomains && rootDomain) {
     const host = request.headers.get("host") || "";

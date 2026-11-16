@@ -347,7 +347,7 @@ export function LandingPage({
                   2
                 </div>
                 <h3 className="mt-5 text-lg font-bold text-ink sm:text-xl">
-                  Get Zoom Link on WhatsApp
+                  Get Zoom Link on Telegram
                 </h3>
                 <p className="mt-2 text-sm text-mute">
                   Receive your personal Zoom meeting room ID, calendar reminder, and session prep kit

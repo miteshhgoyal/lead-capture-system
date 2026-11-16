@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@onestockacademy.com"
+              placeholder="admin@freecourselink.com"
             />
           </Field>
 
@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
         </form>
 
         <p className="mt-6 text-center text-xs text-mute">
-          OneStock Academy · Lead Capture System
+          Free Course Link · Lead Capture System
         </p>
       </div>
     </div>

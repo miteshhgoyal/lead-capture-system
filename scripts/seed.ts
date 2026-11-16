@@ -11,7 +11,7 @@ async function seed() {
   await dbConnect();
 
   // 1. Seed / Upsert Admin User
-  const adminEmail = (process.env.ADMIN_EMAIL || "admin@onestockacademy.com").toLowerCase().trim();
+  const adminEmail = (process.env.ADMIN_EMAIL || "admin@freecourselink.com").toLowerCase().trim();
   const adminPass = process.env.ADMIN_PASSWORD || "AdminPass123!@#";
 
   const existingAdmin = await AdminUser.findOne({ email: adminEmail });

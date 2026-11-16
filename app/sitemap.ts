@@ -3,7 +3,7 @@ import { dbConnect } from "@/lib/db";
 import { Partner } from "@/lib/models/Partner";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://onestockacademy.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://freecourselink.com";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

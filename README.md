@@ -1,4 +1,4 @@
-# OneStock Academy — Multi-Partner Lead Capture System
+# Free Course Link — Multi-Partner Lead Capture System
 
 A high-converting, multi-partner lead capture and attribution system for trading-education free webinars and live Zoom masterclasses. Built with **Next.js 16 (App Router + Turbopack)**, **React 19**, **TypeScript**, **Tailwind CSS v4**, **MongoDB (Mongoose)**, and stateless **JWT session authentication**.
 
@@ -58,17 +58,17 @@ Configure your variables in `.env`:
 MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/leadcapture?retryWrites=true&w=majority
 
 # Admin Credentials (Seeded on first run / fallback authentication)
-ADMIN_EMAIL=admin@onestockacademy.com
+ADMIN_EMAIL=admin@freecourselink.com
 ADMIN_PASSWORD=AdminPass123!@#
 # Generate a secure 32+ character key: openssl rand -base64 48
 ADMIN_SESSION_SECRET=qAfSXZIbpEvKOB5AS5xfeHMLN1QqADKE3b1tBflyxeC64ZVNvsW3B/dtk9xHq1iP
 
 # Canonical Public URL
-NEXT_PUBLIC_SITE_URL=https://onestockacademy.com
+NEXT_PUBLIC_SITE_URL=https://freecourselink.com
 
 # Wildcard Subdomain Routing (Optional)
 ENABLE_SUBDOMAINS=false
-ROOT_DOMAIN=onestockacademy.com
+ROOT_DOMAIN=freecourselink.com
 
 # Cloudinary Storage for Partner Logos (Optional: falls back to persistent local /public/uploads)
 CLOUDINARY_CLOUD_NAME=
@@ -90,7 +90,7 @@ pnpm seed
 Output:
 ```text
 🌱 Starting seed script...
-✅ Admin user created: admin@onestockacademy.com
+✅ Admin user created: admin@freecourselink.com
 ✅ Default SiteSettings initialized.
 ✅ Demo partner created: Aman Singh (/aman-singh)
 ✅ Seeded 4 sample leads.
@@ -126,27 +126,27 @@ pnpm build
 
 ## 🌐 Wildcard Subdomains Setup (`{slug}.domain.com`)
 
-The system supports running partner landing pages under custom subdomains (e.g. `aman-singh.onestockacademy.com`) using Next.js Proxy rewrites:
+The system supports running partner landing pages under custom subdomains (e.g. `aman-singh.freecourselink.com`) using Next.js Proxy rewrites:
 
 ### Step 1: Enable Environment Flags
 In `.env`:
 ```env
 ENABLE_SUBDOMAINS=true
-ROOT_DOMAIN=onestockacademy.com
+ROOT_DOMAIN=freecourselink.com
 ```
 
 ### Step 2: Wildcard DNS Record
 In your DNS provider (Cloudflare, Namecheap, GoDaddy, Route53):
 - **Type**: `CNAME` or `A`
-- **Name**: `*` (or `*.onestockacademy.com`)
+- **Name**: `*` (or `*.freecourselink.com`)
 - **Target**: Points to your server IP or platform CNAME (e.g. `cname.vercel-dns.com` or your VPS IP)
 
 ### Step 3: Wildcard SSL Certificate
 - **Cloudflare**: Enabled automatically with Universal SSL for all first-level subdomains (`*.domain.com`).
-- **Vercel / Railway / Render**: Add `*.onestockacademy.com` to Domains; the platform automatically provisions a Let's Encrypt Wildcard SSL certificate.
+- **Vercel / Railway / Render**: Add `*.freecourselink.com` to Domains; the platform automatically provisions a Let's Encrypt Wildcard SSL certificate.
 - **Custom VPS (Nginx + Certbot)**:
   ```bash
-  certbot certonly --manual --preferred-challenges dns -d "onestockacademy.com" -d "*.onestockacademy.com"
+  certbot certonly --manual --preferred-challenges dns -d "freecourselink.com" -d "*.freecourselink.com"
   ```
 
 ---

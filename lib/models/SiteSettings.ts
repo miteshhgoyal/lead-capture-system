@@ -50,7 +50,7 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
       default:
         "Senior institutional traders and certified technical analysts sharing real-world market strategies with over 60,000 students worldwide.",
     },
-    brandName: { type: String, default: "OneStock Academy" },
+    brandName: { type: String, default: "Free Course Link" },
     brandTagline: { type: String, default: "Zero To Profitable Trader" },
     logoUrl: { type: String, default: "" },
     faqs: {

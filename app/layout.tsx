@@ -9,23 +9,23 @@ const inter = Inter({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://onestockacademy.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://freecourselink.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: "/" },
-  title: { default: "OneStock Academy - Free Live Trading Masterclass", template: "%s | OneStock Academy" },
+  title: { default: "Free Course Link - Free Live Trading Masterclass", template: "%s | Free Course Link" },
   description: "Master high-probability price action trading, disciplined risk management, and live chart execution. 100% Free webinar.",
   openGraph: {
-    title: "OneStock Academy - Free Live Trading Masterclass",
+    title: "Free Course Link - Free Live Trading Masterclass",
     description: "Master high-probability price action trading, disciplined risk management, and live chart execution. 100% Free webinar.",
     type: "website",
     url: SITE_URL,
-    siteName: "OneStock Academy",
+    siteName: "Free Course Link",
   },
   twitter: {
     card: "summary_large_image",
-    title: "OneStock Academy - Free Live Trading Masterclass",
+    title: "Free Course Link - Free Live Trading Masterclass",
     description: "Master high-probability price action trading, disciplined risk management, and live chart execution. 100% Free webinar.",
   },
 };

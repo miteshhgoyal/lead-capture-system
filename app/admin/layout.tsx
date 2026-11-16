@@ -7,7 +7,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: { default: "Admin Console", template: "%s | OneStock Academy Admin" },
+  title: { default: "Admin Console", template: "%s | Free Course Link Admin" },
 };
 
 async function AdminAuthGuard({ children }: { children: ReactNode }) {

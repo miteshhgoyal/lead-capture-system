@@ -99,7 +99,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
           </div>
           <div>
             <div className="font-semibold text-cell text-ink leading-tight">
-              OneStock Academy
+              Free Course Link
             </div>
             <div className="text-[11px] text-mute font-medium">Lead Capture Console</div>
           </div>

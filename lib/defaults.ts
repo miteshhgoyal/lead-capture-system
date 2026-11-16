@@ -35,7 +35,7 @@ export const DEFAULT_SETTINGS: SiteSettingsData = {
   defaultMentorName: "OneStock Trading Academy",
   defaultMentorBio:
     "Senior institutional traders and certified technical analysts sharing real-world market strategies with over 60,000 students worldwide.",
-  brandName: "OneStock Academy",
+  brandName: "Free Course Link",
   brandTagline: "Zero To Profitable Trader",
   logoUrl: "/tp-logo-light.png",
   faqs: [

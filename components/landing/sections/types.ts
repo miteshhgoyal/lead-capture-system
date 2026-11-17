@@ -7,7 +7,9 @@ export interface PageContext {
   logoUrl: string;
   mentorName: string;
   mentorBio: string;
+  /** Community links are only shown on the lead form's success screen. Empty = not offered. */
   telegramLink: string;
+  whatsappLink: string;
   partnerSlug: string;
   trustLine: string;
   disclaimer: string;

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { dbConnect } from "../db";
 import { Partner, type IPartner } from "../models/Partner";
+import { SiteSettings, type ISiteSettings } from "../models/SiteSettings";
 import { generatePartnerPage, type GenerateOptions } from "./generate";
 import type { PartnerPageConfig } from "./types";
 import { hasPageConfig } from "./validate";
@@ -47,3 +48,23 @@ export async function regeneratePartnerPage(id: string | Types.ObjectId, options
 
 /** The $set payload that stores a generated page on a partner document. */
 export { toUpdate as pageConfigUpdate };
+
+/** The root page (`/`): the saved page from site settings, or null to keep the original design. */
+export async function getRootPage(): Promise<PartnerPageConfig | null> {
+  try {
+    await dbConnect();
+    const doc = await SiteSettings.findOne({ key: "main" }).lean<ISiteSettings | null>();
+    return hasPageConfig(doc) ? toUpdate(doc) : null;
+  } catch (error) {
+    console.error("[getRootPage] DB read failed, using the original design:", error);
+    return null;
+  }
+}
+
+/** Admin action: shuffles the root page. `legacy` restores the original design. */
+export async function regenerateRootPage(options: GenerateOptions = {}): Promise<PartnerPageConfig> {
+  await dbConnect();
+  const generated = generatePartnerPage({}, options);
+  await SiteSettings.updateOne({ key: "main" }, { $set: toUpdate(generated) }, { upsert: true });
+  return generated;
+}

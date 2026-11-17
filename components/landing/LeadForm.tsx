@@ -8,19 +8,21 @@ import {
 } from "@/lib/validation/lead";
 import { COUNTRIES, type CountryOption } from "./country-data";
 import { Confetti } from "./Confetti";
-import { ArrowRight, Lock, Zap } from "lucide-react";
+import { ArrowRight, Lock, MessageCircle, Send, Zap } from "lucide-react";
 
 interface LeadFormProps {
   partnerSlug?: string;
   partnerName?: string;
   telegramLink?: string;
+  whatsappLink?: string;
   className?: string;
 }
 
 export function LeadForm({
   partnerSlug = "direct",
   partnerName: _partnerName = "Direct",
-  telegramLink = "https://t.me/onestockacademy",
+  telegramLink = "",
+  whatsappLink = "",
   className = "",
 }: LeadFormProps) {
   const [name, setName] = useState("");
@@ -47,7 +49,7 @@ export function LeadForm({
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedTelegramLink, setSubmittedTelegramLink] = useState(telegramLink);
-  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [submittedWhatsappLink, setSubmittedWhatsappLink] = useState(whatsappLink);
 
   // Extract UTMs and referrer upon mount
   useEffect(() => {
@@ -65,21 +67,6 @@ export function LeadForm({
       return { utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, landingUrl };
     });
   }, []);
-
-  // Handle auto-redirect countdown after submission
-  useEffect(() => {
-    if (!isSubmitted || redirectCountdown === null) return;
-    if (redirectCountdown <= 0) {
-      if (submittedTelegramLink && submittedTelegramLink.startsWith("http")) {
-        window.location.href = submittedTelegramLink;
-      }
-      return;
-    }
-    const timer = setTimeout(() => {
-      setRedirectCountdown((prev) => (prev !== null ? prev - 1 : null));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [isSubmitted, redirectCountdown, submittedTelegramLink]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,10 +117,9 @@ export function LeadForm({
           return;
         }
 
-        const tLink = data.telegramLink || telegramLink;
-        setSubmittedTelegramLink(tLink);
+        setSubmittedTelegramLink(data.telegramLink || telegramLink);
+        setSubmittedWhatsappLink(data.whatsappLink || whatsappLink);
         setIsSubmitted(true);
-        setRedirectCountdown(6); // 6-second auto-redirect countdown
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "A network error occurred. Please try again.";
         setFormError(message);
@@ -180,43 +166,51 @@ export function LeadForm({
             via WhatsApp and to <span className="font-semibold text-ink">{email}</span>.
           </p>
 
-          {/* Action Box */}
-          <div className="my-6 w-full rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left">
-            <div className="flex items-start gap-3">
-              <Zap className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
-              <div>
-                <h4 className="text-sm font-semibold text-ink">Immediate Next Step</h4>
-                <p className="mt-0.5 text-xs text-mute">
-                  Join our official VIP Telegram community now to receive session resources, chart
-                  templates, and instant live reminders.
-                </p>
+          {/* Community links: shown only here, after the lead is saved */}
+          {(submittedTelegramLink || submittedWhatsappLink) && (
+            <>
+              <div className="my-6 w-full rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left">
+                <div className="flex items-start gap-3">
+                  <Zap className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
+                  <div>
+                    <h4 className="text-sm font-semibold text-ink">Immediate Next Step</h4>
+                    <p className="mt-0.5 text-xs text-mute">
+                      Join our official community now to receive session resources, chart templates, and
+                      instant live reminders.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <a
-            href={submittedTelegramLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            <svg className="size-5 shrink-0 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.458c.538-.196 1.006.128.832.963z" />
-            </svg>
-            Join Partner Telegram Channel
-          </a>
-
-          {redirectCountdown !== null && redirectCountdown > 0 && (
-            <p className="mt-3 text-xs text-mute">
-              Auto-redirecting to Telegram in {redirectCountdown}s...{" "}
-              <button
-                type="button"
-                onClick={() => setRedirectCountdown(null)}
-                className="underline hover:text-ink"
-              >
-                Cancel
-              </button>
-            </p>
+              <div className="flex w-full flex-col gap-3">
+                {submittedTelegramLink && (
+                  <a
+                    href={submittedTelegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98]"
+                  >
+                    <Send className="size-5 shrink-0" aria-hidden />
+                    Join Telegram Community
+                  </a>
+                )}
+                {submittedWhatsappLink && (
+                  <a
+                    href={submittedWhatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={
+                      submittedTelegramLink
+                        ? "inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-accent px-6 py-3.5 text-base font-semibold text-accent transition-all hover:bg-accent/10 active:scale-[0.98]"
+                        : "inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98]"
+                    }
+                  >
+                    <MessageCircle className="size-5 shrink-0" aria-hidden />
+                    Join WhatsApp Community
+                  </a>
+                )}
+              </div>
+            </>
           )}
 
           <div className="mt-6 flex items-center justify-center gap-1.5 border-t border-hairline pt-4 text-xs text-mute">

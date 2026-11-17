@@ -2,7 +2,7 @@
 
 import { BadgeCheck } from "lucide-react";
 import { Reveal } from "../motion/Reveal";
-import { Container, Section, TelegramGlyph } from "./ui";
+import { Container, Section } from "./ui";
 import type { PageContext, SectionProps } from "./types";
 
 type MentorProps = SectionProps<"mentor">;
@@ -13,20 +13,6 @@ function MentorLogo({ ctx, className }: { ctx: PageContext; className: string })
     <div className={`flex items-center justify-center border border-hairline bg-bg p-3 shadow-sm ${className}`}>
       <img src={ctx.logoUrl} alt={ctx.mentorName} className="max-h-full max-w-full object-contain" />
     </div>
-  );
-}
-
-function TelegramButton({ ctx, label, className = "" }: { ctx: PageContext; label: string; className?: string }) {
-  return (
-    <a
-      href={ctx.telegramLink}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 rounded-xl border border-hairline bg-bg px-4 py-2.5 text-xs font-semibold text-ink shadow-sm transition hover:bg-hairline ${className}`}
-    >
-      <TelegramGlyph />
-      {label}
-    </a>
   );
 }
 
@@ -49,9 +35,6 @@ export function Mentor1({ content, ctx }: MentorProps) {
               <h4 className="rt-h text-lg font-bold text-ink sm:text-xl">{content.title}</h4>
               <p className="mt-3 text-sm leading-relaxed text-mute sm:text-base">{ctx.mentorBio}</p>
               <p className="mt-3 text-sm leading-relaxed text-mute sm:text-base">{content.body}</p>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                <TelegramButton ctx={ctx} label={content.ctaLabel} />
-              </div>
             </div>
           </div>
         </Reveal>
@@ -75,9 +58,6 @@ export function Mentor2({ content, ctx }: MentorProps) {
           <h4 className="rt-h mx-auto mt-8 max-w-2xl text-xl font-semibold leading-snug text-ink sm:text-2xl">{content.title}</h4>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-mute">{ctx.mentorBio}</p>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-mute">{content.body}</p>
-          <div className="mt-7 flex justify-center">
-            <TelegramButton ctx={ctx} label={content.ctaLabel} />
-          </div>
         </Reveal>
       </Container>
     </Section>
@@ -102,9 +82,6 @@ export function Mentor3({ content, ctx }: MentorProps) {
             <h4 className="rt-h text-xl font-bold text-ink">{content.title}</h4>
             <p className="mt-3 text-sm leading-relaxed text-mute sm:text-base">{ctx.mentorBio}</p>
             <p className="mt-3 text-sm leading-relaxed text-mute">{content.body}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <TelegramButton ctx={ctx} label={content.ctaLabel} />
-            </div>
           </div>
         </Reveal>
       </Container>

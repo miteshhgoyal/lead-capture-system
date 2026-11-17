@@ -17,6 +17,7 @@ export interface PartnerView {
   name?: string;
   slug?: string;
   telegramLink?: string;
+  whatsappLink?: string;
   tagline?: string;
   mentorBio?: string;
   logoUrl?: string;
@@ -94,7 +95,8 @@ export function resolvePage({
     logoUrl: partner?.logoUrl || settings.logoUrl || "/tp-logo-light.png",
     mentorName: partner?.name || settings.defaultMentorName,
     mentorBio: partner?.mentorBio || settings.defaultMentorBio,
-    telegramLink: partner?.telegramLink || settings.defaultTelegramLink,
+    telegramLink: (isCustomPartner ? partner?.telegramLink : "") || settings.defaultTelegramLink || "",
+    whatsappLink: (isCustomPartner ? partner?.whatsappLink : "") || settings.defaultWhatsappLink || "",
     partnerSlug: partner?.slug || "direct",
     trustLine: vars.trustLine,
     disclaimer: settings.disclaimer || "Trading involves risk. Educational purposes only. No guaranteed returns.",
@@ -104,6 +106,6 @@ export function resolvePage({
     preview,
   };
 
-  const primary = isCustomPartner ? partner?.theme?.primaryColor : undefined;
+  const primary = (isCustomPartner ? partner?.theme?.primaryColor : settings.primaryColor) || undefined;
   return { ctx, order, content, themeVars: buildThemeVars(primary, plan.themeConfig), vars };
 }

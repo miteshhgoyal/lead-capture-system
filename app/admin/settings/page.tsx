@@ -9,6 +9,8 @@ import {
   SectionHeader,
 } from "@/components/admin/AdminPrimitives";
 import { useToast } from "@/components/admin/Toast";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { Shuffle, X } from "lucide-react";
 import type { SiteSettingsData } from "@/lib/defaults";
 
 export default function SettingsPage() {
@@ -17,6 +19,50 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<SiteSettingsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, startSaving] = useTransition();
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [shuffleOpen, setShuffleOpen] = useState(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !settings) return;
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setSettings((prev) => (prev ? { ...prev, logoUrl: data.url } : prev));
+        showToast("Logo uploaded. Save settings to apply it.", "success");
+      } else {
+        showToast(data.error || "Logo upload failed", "error");
+      }
+    } catch {
+      showToast("Network error uploading logo", "error");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleShuffle = async (original: boolean) => {
+    try {
+      const res = await fetch("/api/admin/settings/regenerate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ original }),
+      });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        showToast(original ? "Root page restored to the original design" : "Root page shuffled", "success");
+      } else {
+        showToast(json.error || "Failed to shuffle page", "error");
+      }
+    } catch {
+      showToast("Network error", "error");
+    } finally {
+      setShuffleOpen(false);
+    }
+  };
 
   // Password fields
   const [currentPassword, setCurrentPassword] = useState("");
@@ -154,10 +200,9 @@ export default function SettingsPage() {
           </Field>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Default Telegram Link" required>
+            <Field label="Telegram Community Link (Optional)">
               <Input
                 type="url"
-                required
                 value={settings.defaultTelegramLink}
                 onChange={(e) =>
                   setSettings({ ...settings, defaultTelegramLink: e.target.value })
@@ -165,7 +210,7 @@ export default function SettingsPage() {
               />
             </Field>
 
-            <Field label="Default WhatsApp Link (Optional)">
+            <Field label="WhatsApp Community Link (Optional)">
               <Input
                 type="url"
                 value={settings.defaultWhatsappLink || ""}
@@ -174,6 +219,79 @@ export default function SettingsPage() {
                 }
               />
             </Field>
+          </div>
+
+          <p className="-mt-2 text-xs text-mute">
+            Community links are shown to a visitor only after they submit the form, never elsewhere on the page.
+          </p>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Brand Colour">
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={settings.primaryColor || "#0f766e"}
+                  onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
+                  className="size-9 cursor-pointer rounded-lg border-0 p-0"
+                  aria-label="Brand colour"
+                />
+                <Input
+                  value={settings.primaryColor || ""}
+                  placeholder="Original palette"
+                  onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
+                />
+                {settings.primaryColor ? (
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, primaryColor: "" })}
+                    className="text-xs text-mute underline hover:text-ink"
+                  >
+                    Reset
+                  </button>
+                ) : null}
+              </div>
+            </Field>
+
+            <Field label="Logo (PNG, JPG, SVG, WebP · Max 2 MB)">
+              <div className="flex items-center gap-3">
+                {settings.logoUrl ? (
+                  <div className="relative size-12 shrink-0 rounded-xl border border-hairline bg-card p-1">
+                    <img src={settings.logoUrl} alt="Logo preview" className="size-full object-contain" />
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, logoUrl: "" })}
+                      className="absolute -right-1 -top-1 rounded-full bg-down p-0.5 text-white"
+                      aria-label="Remove logo"
+                    >
+                      <X className="size-3" aria-hidden />
+                    </button>
+                  </div>
+                ) : null}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  onChange={handleLogoUpload}
+                  disabled={uploadingLogo}
+                  className="block w-full text-xs text-mute file:mr-3 file:rounded-xl file:border-0 file:bg-accent/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-accent"
+                />
+              </div>
+              {uploadingLogo && <p className="mt-1 text-xs text-accent">Uploading logo...</p>}
+            </Field>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-bg-alt/40 p-4">
+            <div>
+              <p className="text-sm font-semibold text-ink">Root page layout</p>
+              <p className="text-xs text-mute">Shuffle picks a new layout, copy, theme and section order for the root page.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" onClick={() => handleShuffle(true)}>
+                Use original
+              </Button>
+              <Button type="button" onClick={() => setShuffleOpen(true)} className="bg-accent text-accent-ink">
+                <Shuffle className="mr-1.5 size-4" aria-hidden /> Shuffle page
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -279,6 +397,14 @@ export default function SettingsPage() {
           </div>
         </form>
       </Card>
+      <ConfirmDialog
+        isOpen={shuffleOpen}
+        title="Shuffle root page"
+        description="Pick a brand new layout, copy, theme and section order for the root page? The current look will be replaced."
+        confirmText="Shuffle"
+        onConfirm={() => handleShuffle(false)}
+        onCancel={() => setShuffleOpen(false)}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Schema, model, models, type Model } from "mongoose";
+import type { ContentConfig, LayoutConfig, SectionKey, ThemeConfig } from "../page-builder/types";
 
 export interface ISiteSettings {
   key: "main";
@@ -13,6 +14,13 @@ export interface ISiteSettings {
   brandName: string;
   brandTagline: string;
   logoUrl?: string;
+  /** Single brand colour for the root page (empty = the original palette). */
+  primaryColor?: string;
+  layoutConfig?: LayoutConfig | null;
+  contentConfig?: ContentConfig | null;
+  themeConfig?: ThemeConfig | null;
+  sectionOrder?: SectionKey[] | null;
+  seed?: number | null;
   faqs: { q: string; a: string }[];
   disclaimer: string;
   analytics?: {
@@ -53,6 +61,12 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
     brandName: { type: String, default: "Free Course Link" },
     brandTagline: { type: String, default: "Zero To Profitable Trader" },
     logoUrl: { type: String, default: "" },
+    primaryColor: { type: String, default: "" },
+    layoutConfig: { type: Schema.Types.Mixed, default: null },
+    contentConfig: { type: Schema.Types.Mixed, default: null },
+    themeConfig: { type: Schema.Types.Mixed, default: null },
+    sectionOrder: { type: Schema.Types.Mixed, default: null },
+    seed: { type: Number, default: null },
     faqs: {
       type: [
         {

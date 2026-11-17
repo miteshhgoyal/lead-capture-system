@@ -26,6 +26,7 @@ const ctx: PageContext = {
   mentorName: "Test Mentor",
   mentorBio: "A short bio.",
   telegramLink: "https://t.me/test",
+  whatsappLink: "https://chat.whatsapp.com/test",
   partnerSlug: "test",
   trustLine: "100% Free",
   disclaimer: "Trading involves risk.",

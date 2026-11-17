@@ -46,7 +46,10 @@ export async function POST(req: Request) {
     let partnerSlug = "direct";
     let partnerName = "Direct";
     let source: "partner-page" | "direct" = "direct";
-    let telegramLink = "https://t.me/onestockacademy";
+    let telegramLink = "";
+    let whatsappLink = "";
+    let partnerTelegram = "";
+    let partnerWhatsapp = "";
 
     const requestedSlug = (json.partnerSlug || "").trim().toLowerCase();
     if (requestedSlug && requestedSlug !== "direct") {
@@ -56,16 +59,15 @@ export async function POST(req: Request) {
         partnerSlug = partner.slug;
         partnerName = partner.name;
         source = "partner-page";
-        if (partner.telegramLink) telegramLink = partner.telegramLink;
+        partnerTelegram = partner.telegramLink || "";
+        partnerWhatsapp = partner.whatsappGroupLink || "";
       }
     }
 
-    if (source === "direct") {
-      const settings = await SiteSettings.findOne({ key: "main" }).lean();
-      if (settings?.defaultTelegramLink) {
-        telegramLink = settings.defaultTelegramLink;
-      }
-    }
+    // Community links shown after submit: the partner's own, else the site defaults.
+    const siteSettings = await SiteSettings.findOne({ key: "main" }).lean();
+    telegramLink = partnerTelegram || siteSettings?.defaultTelegramLink || "https://t.me/onestockacademy";
+    whatsappLink = partnerWhatsapp || siteSettings?.defaultWhatsappLink || "";
 
     // 5. Phone Normalization (E.164)
     const normalizedPhone = normalizePhone(data.phone, data.countryCode);
@@ -149,6 +151,7 @@ export async function POST(req: Request) {
       partnerSlug,
       partnerName,
       telegramLink,
+      whatsappLink,
     });
   } catch (error) {
     console.error("[api/leads] Error saving lead:", error);

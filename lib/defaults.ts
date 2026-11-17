@@ -16,6 +16,8 @@ export interface SiteSettingsData {
   brandName: string;
   brandTagline: string;
   logoUrl?: string;
+  /** Brand colour for the root page; empty keeps the original palette. */
+  primaryColor?: string;
   faqs: { q: string; a: string }[];
   disclaimer: string;
   analytics?: {
@@ -38,6 +40,7 @@ export const DEFAULT_SETTINGS: SiteSettingsData = {
   brandName: "Free Course Link",
   brandTagline: "Zero To Profitable Trader",
   logoUrl: "/tp-logo-light.png",
+  primaryColor: "",
   faqs: [
     {
       q: "Is this trading masterclass really 100% free?",

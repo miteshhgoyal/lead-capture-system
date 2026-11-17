@@ -19,7 +19,7 @@ interface AnimatedTextProps {
 }
 
 const LETTER_MODES: TextKind[] = ["typewriter", "blur-letters"];
-const MAX_TOTAL_DELAY = 1400;
+const MAX_TOTAL_DELAY = 700;
 
 /**
  * Word-by-word reveal, mask slide-up, typewriter or blur-in letter stagger.

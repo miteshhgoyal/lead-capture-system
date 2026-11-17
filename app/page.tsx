@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
+import { getRootPage } from "@/lib/page-builder/persist";
 import { LandingPage } from "@/components/landing/LandingPage";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,6 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const settings = await getSettings();
-  return <LandingPage settings={settings} isCustomPartner={false} />;
+  const [settings, page] = await Promise.all([getSettings(), getRootPage()]);
+  return <LandingPage settings={settings} isCustomPartner={false} page={page} />;
 }

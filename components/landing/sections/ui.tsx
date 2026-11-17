@@ -130,7 +130,7 @@ export function HeroForm({ ctx }: { ctx: PageContext }) {
       </div>
     );
   }
-  return <LeadForm partnerSlug={ctx.partnerSlug} partnerName={ctx.mentorName} telegramLink={ctx.telegramLink} />;
+  return <LeadForm partnerSlug={ctx.partnerSlug} partnerName={ctx.mentorName} telegramLink={ctx.telegramLink} whatsappLink={ctx.whatsappLink} />;
 }
 
 export function TelegramGlyph({ className = "size-4 fill-accent" }: { className?: string }) {

@@ -554,7 +554,7 @@ noscript .fg-draw {
   to { opacity: 1; transform: none; filter: none; }
 }
 
-.rt-text .rt-wrap { display: inline-block; white-space: nowrap; }
+.rt-text .rt-wrap { display: inline-block; white-space: nowrap; max-width: 100%; }
 .rt-text .rt-u { display: inline-block; }
 .rt-text[data-state="hidden"] .rt-u { opacity: 0; }
 .rt-text[data-state="shown"] .rt-u {
@@ -564,7 +564,7 @@ noscript .fg-draw {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .rt-text[data-mode="words"][data-state="shown"] .rt-u { animation-name: rt-word-in; }
-.rt-text[data-mode="mask"] .rt-wrap { overflow: hidden; vertical-align: bottom; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.rt-text[data-mode="mask"] .rt-wrap { overflow: hidden; vertical-align: bottom; padding: 0.1em 0.08em 0.3em; margin: -0.1em -0.08em -0.3em; }
 .rt-text[data-mode="mask"][data-state="hidden"] .rt-u { opacity: 1; transform: translateY(108%); }
 .rt-text[data-mode="mask"][data-state="shown"] .rt-u { animation-name: rt-mask-up; }
 .rt-text[data-mode="typewriter"][data-state="shown"] .rt-u { animation-name: rt-type; animation-duration: 1ms; animation-timing-function: steps(1, end); }

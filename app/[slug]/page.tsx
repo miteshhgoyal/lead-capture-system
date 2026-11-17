@@ -37,6 +37,7 @@ function toPartnerView(partner: IPartner): PartnerView {
     name: partner.name,
     slug: partner.slug,
     telegramLink: partner.telegramLink,
+    whatsappLink: partner.whatsappGroupLink,
     tagline: partner.tagline,
     mentorBio: partner.mentorBio,
     logoUrl: partner.logoUrl,

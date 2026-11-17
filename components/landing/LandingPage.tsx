@@ -6,8 +6,7 @@ import { generatePartnerPage } from "@/lib/page-builder/generate";
 import type { SectionKey } from "@/lib/page-builder/types";
 import { AnimationProvider, useAnimationPreset } from "./motion";
 import { resolvePage, type PagePlan, type PartnerView } from "./page-context";
-import { getVariant } from "./registry";
-import type { PageContext } from "./sections/types";
+import { RenderSection } from "./registry";
 
 interface LandingPageProps {
   partner?: PartnerView | null;
@@ -22,28 +21,12 @@ interface LandingPageProps {
 /** The original design: variant 1 and the original copy for every section. */
 const ORIGINAL_PAGE: PagePlan = generatePartnerPage({}, { legacy: true, seed: 0 });
 
-function Section<K extends SectionKey>({
-  name,
-  variantId,
-  content,
-  ctx,
-}: {
-  name: K;
-  variantId: string;
-  content: PageContentOf<K>;
-  ctx: PageContext;
-}) {
-  const Variant = getVariant(name, variantId);
-  return <Variant content={content} ctx={ctx} />;
-}
-type PageContentOf<K extends SectionKey> = ReturnType<typeof resolvePage>["content"][K];
-
 function PageBody({ page, plan }: { page: ReturnType<typeof resolvePage>; plan: PagePlan }) {
   const preset = useAnimationPreset();
   const style = page.themeVars as CSSProperties;
   const { order, content, ctx } = page;
   const render = (k: SectionKey) => (
-    <Section key={k} name={k} variantId={plan.layoutConfig[k]} content={content[k]} ctx={ctx} />
+    <RenderSection key={k} name={k} variantId={plan.layoutConfig[k]} content={content[k]} ctx={ctx} />
   );
 
   return (

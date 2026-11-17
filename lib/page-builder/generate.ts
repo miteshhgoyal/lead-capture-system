@@ -64,7 +64,8 @@ function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
-function buildContent(choose: <K extends SectionKey | "meta">(key: K) => number): ContentConfig {
+/** Builds a ContentConfig by choosing a pool index per section (used by the generator and the dev preview). */
+export function buildContent(choose: <K extends SectionKey | "meta">(key: K) => number): ContentConfig {
   const out: Record<string, unknown> = {};
   for (const key of [...SECTION_KEYS, "meta"] as const) {
     const entries = CONTENT_POOLS[key] as { id: string; content: unknown }[];

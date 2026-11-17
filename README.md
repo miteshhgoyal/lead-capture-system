@@ -117,6 +117,34 @@ pnpm build
 
 ---
 
+## Partner Landing Page System
+
+Every partner gets their own randomized landing page, generated **once** and saved on the partner document. Page views only read what is saved; nothing is re-randomized on load.
+
+- **Routing**: partners resolve only by `/{slug}`. There is no host/subdomain handling.
+- **Brand colour**: a partner configures a single colour (`theme.primaryColor`). The secondary tone, surface tints and button ink are derived from it.
+- **Typography**: Inter only. Page "type styles" vary weight and tracking, never the typeface.
+- **Icons**: [lucide-react](https://lucide.dev). No emoji anywhere in the UI.
+- **Sections** (`components/landing/sections/*`): navbar (3 variants), hero (4), features (4), steps (3), mentor (3), stats (3), testimonials (3), offer (3), FAQ (3), CTA (3), footer (3). Variant 1 of each is the original design. All variants of a section share one props type and are registered in `components/landing/registry.tsx` (`SECTION_VARIANTS`).
+- **Copy** (`lib/page-builder/pools.ts`): pool entry 1 is the original text; the rest are alternatives. `{{partnerName}}`, `{{brand}}` etc. are filled from the partner's real data at render time, and partner fields (name, logo, tagline, bio, links, colour) always win over pool copy.
+- **Generator** (`lib/page-builder/generate.ts`): `generatePartnerPage(partner, { seed?, legacy? })` uses a seeded mulberry32 PRNG to choose one variant and one content set per section, a theme (10 palette recipes, 3 radii, 4 button styles, 5 type styles, 4 animation presets) and a rule-checked section order (navbar, hero first; CTA, footer last).
+- **Saved fields on `Partner`**: `layoutConfig`, `contentConfig`, `themeConfig`, `sectionOrder`, `seed` (null until generated).
+- **Testimonials**: the section renders only a partner's own testimonials (add them in the partner form). It is skipped while the list is empty. No testimonial copy is invented.
+- **Animations**: CSS + IntersectionObserver (`components/landing/motion`), selected by `themeConfig.animationStyle` through `useAnimationPreset()`: `soft-fade`, `bold-slide`, `typewriter`, `blur-stagger` (`none` for legacy pages). `prefers-reduced-motion` disables all motion.
+
+### Commands
+
+```bash
+pnpm add lucide-react         # first time only, if node_modules predates the icon change
+pnpm migrate                  # drops subdomain fields/indexes, collapses the old 3-colour theme to 1 colour
+pnpm backfill                 # generate + save a page for partners that don't have one
+pnpm backfill --legacy        # same, but variant 1 + original copy everywhere (pages look exactly as before)
+pnpm backfill --force         # regenerate even partners that already have a page
+pnpm dev                      # then open /dev/layouts to preview every variant (404 in production)
+```
+
+New partners are generated automatically when created in `/admin/partners`. Use the shuffle button in the partners table (admin only) to regenerate a partner's page. A partner with no saved page is generated and saved once on its first view.
+
 ## Logo & Brand Asset Storage
 
 The system includes a dual-storage strategy:

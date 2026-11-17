@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { SectionKey } from "@/lib/page-builder/types";
+import type { SectionContentMap, SectionKey } from "@/lib/page-builder/types";
 import { Hero1, Hero2, Hero3, Hero4 } from "./sections/hero";
 import { Navbar1, Navbar2, Navbar3 } from "./sections/navbar";
-import type { SectionComponent } from "./sections/types";
+import type { PageContext, SectionComponent } from "./sections/types";
 
 /** Reserves space while a below-the-fold chunk loads so nothing jumps. */
 function SectionSkeleton() {
@@ -71,4 +71,20 @@ export const SECTION_VARIANTS: { [K in SectionKey]: Record<string, SectionCompon
 export function getVariant<K extends SectionKey>(section: K, id: string | undefined): SectionComponent<K> {
   const variants = SECTION_VARIANTS[section] as Record<string, SectionComponent<K>>;
   return (id && variants[id]) || variants[`${section}_1`];
+}
+
+/** Renders one section through the registry (unknown ids fall back to variant 1). */
+export function RenderSection<K extends SectionKey>({
+  name,
+  variantId,
+  content,
+  ctx,
+}: {
+  name: K;
+  variantId: string | undefined;
+  content: SectionContentMap[K];
+  ctx: PageContext;
+}) {
+  const Variant = getVariant(name, variantId);
+  return <Variant content={content} ctx={ctx} />;
 }

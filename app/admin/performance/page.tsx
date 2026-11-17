@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/admin/AdminPrimitives";
+import { ArrowRight } from "lucide-react";
 
 interface PerformanceItem {
   _id: string;
@@ -169,7 +170,7 @@ export default function PerformancePage() {
                           className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
                         >
                           <span>View Leads</span>
-                          <span>→</span>
+                          <ArrowRight className="size-3.5" aria-hidden />
                         </Link>
                       </td>
                     </tr>

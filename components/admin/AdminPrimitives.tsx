@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type TextareaHTMLAttributes,
 } from "react";
+import { ArrowDown, ArrowUp, FolderOpen } from "lucide-react";
 
 /* ─────────────────────────── helpers & cursor spotlight ─────────────────── */
 export function onSpotlightMove(e: React.PointerEvent<HTMLElement>) {
@@ -203,7 +204,7 @@ export function StatTile({
         {subtext && <span className="text-mute">{subtext}</span>}
         {delta && (
           <span className={`font-semibold tabular-nums ${delta.positive ? "text-up" : "text-down"}`}>
-            {delta.positive ? "↑" : "↓"} {delta.value}
+            {delta.positive ? <ArrowUp className="inline size-3" aria-hidden /> : <ArrowDown className="inline size-3" aria-hidden />} {delta.value}
           </span>
         )}
       </div>
@@ -620,7 +621,7 @@ export function EmptyState({
       {icon ? (
         <div className="mb-4 rounded-full bg-alt p-3 text-mute">{icon}</div>
       ) : (
-        <div className="mb-4 text-3xl">📂</div>
+        <FolderOpen className="mb-4 size-8 text-mute" aria-hidden />
       )}
       <h3 className="text-ctitle font-semibold text-ink">{title}</h3>
       {description && <p className="mt-1.5 max-w-sm text-cell text-mute">{description}</p>}

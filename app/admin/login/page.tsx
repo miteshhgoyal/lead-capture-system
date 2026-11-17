@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Field, Input } from "@/components/admin/AdminPrimitives";
 import { ThemeToggle } from "@/components/landing/ThemeToggle";
+import { ArrowRight } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function AdminLoginPage() {
             disabled={busy}
             className="w-full justify-center bg-accent text-accent-ink font-semibold py-3"
           >
-            {busy ? "Signing in..." : "Sign In →"}
+            {busy ? "Signing in..." : <>Sign In <ArrowRight className="ml-1 inline size-4" aria-hidden /></>}
           </Button>
         </form>
 

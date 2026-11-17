@@ -4,7 +4,7 @@ A high-converting, multi-partner lead capture and attribution system for trading
 
 ---
 
-## 🌟 Key Architecture & Capabilities
+## Key Architecture & Capabilities
 
 1. **Multi-Partner, Zero-Redeploy Architecture**:
    - Partners are data in MongoDB, not code. When an administrator creates a partner in `/admin`, the partner landing page is **instantly live** at `domain.com/[slug]` without any code commit or redeployment.
@@ -36,7 +36,7 @@ A high-converting, multi-partner lead capture and attribution system for trading
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Prerequisites
 - **Node.js**: v20+ (v26 tested)
@@ -82,12 +82,12 @@ pnpm seed
 
 Output:
 ```text
-🌱 Starting seed script...
-✅ Admin user created: admin@freecourselink.com
-✅ Default SiteSettings initialized.
-✅ Demo partner created: Aman Singh (/aman-singh)
-✅ Seeded 4 sample leads.
-🚀 Seeding complete!
+Starting seed script...
+Admin user created: admin@freecourselink.com
+Default SiteSettings initialized.
+Demo partner created: Aman Singh (/aman-singh)
+Seeded 4 sample leads.
+Seeding complete!
 ```
 
 ### 5. Start Development Server
@@ -98,7 +98,7 @@ Open [http://localhost:3000](http://localhost:3000) for the generic landing page
 
 ---
 
-## 🛠️ Testing & Quality Assurance
+## Testing & Quality Assurance
 
 Run the test suite verifying phone E.164 normalization, lead validation schema, duplicate detection rules, and partner slug reservation:
 ```bash
@@ -117,7 +117,7 @@ pnpm build
 
 ---
 
-## 📁 Logo & Brand Asset Storage
+## Logo & Brand Asset Storage
 
 The system includes a dual-storage strategy:
 1. **Cloudinary CDN (Cloud Storage)**: If `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` are provided in `.env`, uploaded partner logos are uploaded directly to Cloudinary and served via their global CDN.
@@ -126,7 +126,7 @@ The system includes a dual-storage strategy:
 
 ---
 
-## 📊 Deployment Steps
+## Deployment Steps
 
 ### On Vercel
 1. Push this repository to GitHub/GitLab.
@@ -144,7 +144,7 @@ The system includes a dual-storage strategy:
 
 ---
 
-## 🔒 Security & Compliance
+## Security & Compliance
 - **Stateless HTTP-Only JWT Cookies**: Admin session token (`fogm_admin`) with SameSite Strict protection.
 - **Timing-Safe Password Verification**: Scrypt + cryptographic salt comparison via `crypto.timingSafeEqual`.
 - **IP Rate Limiting**: Redis/MongoDB TTL sliding window counters protecting `/api/leads` and `/api/admin/login`.

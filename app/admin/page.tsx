@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/admin/AdminPrimitives";
+import { ArrowRight, ChartColumn } from "lucide-react";
 
 interface StatsData {
   metrics: {
@@ -120,7 +121,7 @@ export default function AdminOverviewPage() {
             href="/admin/leads"
             className="text-xs font-semibold text-accent hover:underline"
           >
-            View All Leads →
+            View All Leads <ArrowRight className="ml-1 inline size-3.5" aria-hidden />
           </Link>
         </div>
 
@@ -130,7 +131,7 @@ export default function AdminOverviewPage() {
           </div>
         ) : !data?.overTime || data.overTime.length === 0 ? (
           <div className="flex h-56 flex-col items-center justify-center text-center text-sm text-mute">
-            <span className="text-2xl mb-1">📊</span>
+            <ChartColumn className="mb-1 size-6" aria-hidden />
             No lead submissions in this period yet.
           </div>
         ) : (
@@ -215,7 +216,7 @@ export default function AdminOverviewPage() {
                 href="/admin/partners"
                 className="text-xs font-semibold text-accent hover:underline"
               >
-                Manage Partners →
+                Manage Partners <ArrowRight className="ml-1 inline size-3.5" aria-hidden />
               </Link>
             </div>
 

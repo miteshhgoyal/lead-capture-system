@@ -12,6 +12,7 @@ import {
 } from "./TradingVisuals";
 import type { IPartner } from "@/lib/models/Partner";
 import type { SiteSettingsData } from "@/lib/defaults";
+import { ArrowDown, ArrowRight, Brain, ChartCandlestick, Check, ShieldCheck, TrendingUp } from "lucide-react";
 
 interface LandingPageProps {
   partner?: Partial<IPartner> | null;
@@ -107,7 +108,7 @@ export function LandingPage({
               onClick={scrollToForm}
               className="hidden rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-ink shadow-sm transition hover:brightness-110 sm:inline-block"
             >
-              Get Free Pass →
+              Get Free Pass <ArrowRight className="ml-1 inline size-3.5" aria-hidden />
             </button>
           </div>
         </div>
@@ -139,7 +140,7 @@ export function LandingPage({
                 <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-card/70 p-3.5 backdrop-blur-sm">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent font-bold">
-                      ✓
+                      <Check className="size-4" aria-hidden />
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-ink">Live Interactive Zoom</h4>
@@ -149,7 +150,7 @@ export function LandingPage({
 
                   <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-card/70 p-3.5 backdrop-blur-sm">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-up/10 text-up font-bold">
-                      ✓
+                      <Check className="size-4" aria-hidden />
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-ink">Zero Prior Experience</h4>
@@ -159,7 +160,7 @@ export function LandingPage({
 
                   <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-card/70 p-3.5 backdrop-blur-sm">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent font-bold">
-                      ✓
+                      <Check className="size-4" aria-hidden />
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-ink">Strict Risk Models</h4>
@@ -169,7 +170,7 @@ export function LandingPage({
 
                   <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-card/70 p-3.5 backdrop-blur-sm">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-up/10 text-up font-bold">
-                      ✓
+                      <Check className="size-4" aria-hidden />
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-ink">Telegram VIP Access</h4>
@@ -184,7 +185,7 @@ export function LandingPage({
                     onClick={scrollToForm}
                     className="w-full rounded-xl bg-accent py-3.5 text-center font-semibold text-accent-ink shadow-lg shadow-accent/25"
                   >
-                    Claim Your Free Pass Now ↓
+                    Claim Your Free Pass Now <ArrowDown className="ml-1 inline size-4" aria-hidden />
                   </button>
                 </div>
               </div>
@@ -222,7 +223,7 @@ export function LandingPage({
               <div className="flex flex-col justify-between rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-8">
                 <div>
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/10 text-accent font-bold text-xl">
-                    📈
+                    <TrendingUp className="size-6" aria-hidden />
                   </div>
                   <h3 className="mt-4 text-xl font-bold text-ink">
                     Institutional Price Action & Market Structure
@@ -241,7 +242,7 @@ export function LandingPage({
               <div className="flex flex-col justify-between rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-8">
                 <div>
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-up/10 text-up font-bold text-xl">
-                    🛡️
+                    <ShieldCheck className="size-6" aria-hidden />
                   </div>
                   <h3 className="mt-4 text-xl font-bold text-ink">
                     Disciplined Risk Management & Asymmetric R:R
@@ -260,7 +261,7 @@ export function LandingPage({
               <div className="flex flex-col justify-between rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-8">
                 <div>
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-accent/10 text-accent font-bold text-xl">
-                    🕯️
+                    <ChartCandlestick className="size-6" aria-hidden />
                   </div>
                   <h3 className="mt-4 text-xl font-bold text-ink">
                     Candlestick Mechanics & Entry Triggers
@@ -279,7 +280,7 @@ export function LandingPage({
               <div className="flex flex-col justify-between rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-8">
                 <div>
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-down/10 text-down font-bold text-xl">
-                    🧠
+                    <Brain className="size-6" aria-hidden />
                   </div>
                   <h3 className="mt-4 text-xl font-bold text-ink">
                     Trading Psychology & Emotion Management
@@ -534,7 +535,7 @@ export function LandingPage({
                     onClick={scrollToForm}
                     className="rounded-xl bg-accent px-8 py-4 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition hover:brightness-110 active:scale-[0.98]"
                   >
-                    Claim My Free Pass Now →
+                    Claim My Free Pass Now <ArrowRight className="ml-1 inline size-4" aria-hidden />
                   </button>
                 </div>
               </div>

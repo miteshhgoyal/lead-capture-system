@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from "react";
+import { Check, Info, X } from "lucide-react";
 
 export interface ToastItem {
   id: string;
@@ -50,16 +51,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           >
             <div className="flex items-center gap-2.5">
               {t.type === "error" ? (
-                <span className="flex size-6 items-center justify-center rounded-full bg-down/15 text-down text-xs font-bold">
-                  ✕
+                <span className="flex size-6 items-center justify-center rounded-full bg-down/15 text-down">
+                  <X className="size-3.5" aria-hidden />
                 </span>
               ) : t.type === "info" ? (
-                <span className="flex size-6 items-center justify-center rounded-full bg-accent/15 text-accent text-xs font-bold">
-                  ℹ
+                <span className="flex size-6 items-center justify-center rounded-full bg-accent/15 text-accent">
+                  <Info className="size-3.5" aria-hidden />
                 </span>
               ) : (
-                <span className="flex size-6 items-center justify-center rounded-full bg-up/15 text-up text-xs font-bold">
-                  ✓
+                <span className="flex size-6 items-center justify-center rounded-full bg-up/15 text-up">
+                  <Check className="size-3.5" aria-hidden />
                 </span>
               )}
               <span>{t.message}</span>

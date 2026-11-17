@@ -7,7 +7,7 @@ import { hashPassword } from "../lib/admin-auth";
 import { DEFAULT_SETTINGS } from "../lib/defaults";
 
 async function seed() {
-  console.log("🌱 Starting seed script...");
+  console.log("Starting seed script...");
   await dbConnect();
 
   // 1. Seed / Upsert Admin User
@@ -22,11 +22,11 @@ async function seed() {
       name: "Super Admin",
       role: "superadmin",
     });
-    console.log(`✅ Admin user created: ${adminEmail} (password: ${adminPass})`);
+    console.log(`Admin user created: ${adminEmail} (password: ${adminPass})`);
   } else {
     existingAdmin.passwordHash = hashPassword(adminPass);
     await existingAdmin.save();
-    console.log(`✅ Admin user password updated: ${adminEmail}`);
+    console.log(`Admin user password updated: ${adminEmail}`);
   }
 
   // 2. Seed Default SiteSettings
@@ -36,9 +36,9 @@ async function seed() {
       key: "main",
       ...DEFAULT_SETTINGS,
     });
-    console.log("✅ Default SiteSettings initialized.");
+    console.log("Default SiteSettings initialized.");
   } else {
-    console.log("ℹ️  SiteSettings already exist.");
+    console.log("SiteSettings already exist.");
   }
 
   // 3. Seed Demo Partner "Aman Singh"
@@ -55,21 +55,19 @@ async function seed() {
         "Certified Technical Analyst with 7+ years of experience trading index futures and currency derivatives. Mentored over 15,000 students on risk-reward asymmetry and candlestick mechanics.",
       theme: {
         primaryColor: "#059669",
-        secondaryColor: "#10b981",
-        accentColor: "#059669",
       },
       isActive: true,
       createdBy: adminEmail,
     });
-    console.log("✅ Demo partner created: Aman Singh (/aman-singh)");
+    console.log("Demo partner created: Aman Singh (/aman-singh)");
   } else {
-    console.log("ℹ️  Demo partner Aman Singh already exists.");
+    console.log("Demo partner Aman Singh already exists.");
   }
 
   // 4. Seed sample leads if collection is empty
   const leadsCount = await Lead.countDocuments({});
   if (leadsCount === 0) {
-    console.log("🌱 Seeding sample leads...");
+    console.log("Seeding sample leads...");
     const sampleLeads = [
       {
         name: "Vikram Malhotra",
@@ -153,10 +151,10 @@ async function seed() {
     ];
 
     await Lead.insertMany(sampleLeads);
-    console.log(`✅ Seeded ${sampleLeads.length} sample leads.`);
+    console.log(`Seeded ${sampleLeads.length} sample leads.`);
   }
 
-  console.log("\n🚀 Seeding complete!");
+  console.log("\nSeeding complete!");
   console.log("-----------------------------------------");
   console.log(`Admin Portal: /admin/login`);
   console.log(`Email:        ${adminEmail}`);
@@ -167,6 +165,6 @@ async function seed() {
 }
 
 seed().catch((err) => {
-  console.error("❌ Seed failed:", err);
+  console.error("Seed failed:", err);
   process.exit(1);
 });

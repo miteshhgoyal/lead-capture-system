@@ -8,6 +8,7 @@ import {
 } from "@/lib/validation/lead";
 import { COUNTRIES, type CountryOption } from "./country-data";
 import { Confetti } from "./Confetti";
+import { ArrowRight, Lock, Zap } from "lucide-react";
 
 interface LeadFormProps {
   partnerSlug?: string;
@@ -182,7 +183,7 @@ export function LeadForm({
           {/* Action Box */}
           <div className="my-6 w-full rounded-2xl border border-accent/20 bg-accent/5 p-4 text-left">
             <div className="flex items-start gap-3">
-              <span className="mt-0.5 text-lg">⚡</span>
+              <Zap className="mt-0.5 size-5 shrink-0 text-accent" aria-hidden />
               <div>
                 <h4 className="text-sm font-semibold text-ink">Immediate Next Step</h4>
                 <p className="mt-0.5 text-xs text-mute">
@@ -218,8 +219,8 @@ export function LeadForm({
             </p>
           )}
 
-          <div className="mt-6 border-t border-hairline pt-4 text-xs text-mute">
-            🔒 100% Free · Join 60,000+ Enrolled Students
+          <div className="mt-6 flex items-center justify-center gap-1.5 border-t border-hairline pt-4 text-xs text-mute">
+            <Lock className="size-3.5" aria-hidden /> 100% Free · Join 60,000+ Enrolled Students
           </div>
         </div>
       </div>
@@ -310,7 +311,7 @@ export function LeadForm({
                 >
                   {COUNTRIES.map((c, i) => (
                     <option key={`${c.code}-${i}`} value={c.dialCode}>
-                      {c.flag} {c.dialCode}
+                      {c.code} {c.dialCode}
                     </option>
                   ))}
                 </select>
@@ -450,7 +451,7 @@ export function LeadForm({
             >
               {COUNTRIES.map((c) => (
                 <option key={c.name} value={c.name}>
-                  {c.flag} {c.name} ({c.dialCode})
+                  {c.name} ({c.dialCode})
                 </option>
               ))}
             </select>
@@ -487,13 +488,13 @@ export function LeadForm({
                 Securing Your Seat...
               </span>
             ) : (
-              <span>Get Free Pass →</span>
+              <span className="inline-flex items-center gap-1.5">Get Free Pass <ArrowRight className="size-4" aria-hidden /></span>
             )}
           </button>
 
           {/* 8. Footer Trust Line */}
-          <p className="pt-1 text-center text-xs text-mute">
-            🔒 100% Free · Join 60,000+ Enrolled Students
+          <p className="flex items-center justify-center gap-1.5 pt-1 text-center text-xs text-mute">
+            <Lock className="size-3.5" aria-hidden /> 100% Free · Join 60,000+ Enrolled Students
           </p>
         </form>
       </div>

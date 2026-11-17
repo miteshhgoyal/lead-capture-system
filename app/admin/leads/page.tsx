@@ -13,6 +13,7 @@ import {
   CAPITAL_OPTIONS,
   type LeadStatus,
 } from "@/lib/validation/lead";
+import { ArrowRight, MessageCircle, Search, Trash2 } from "lucide-react";
 
 interface LeadItem {
   _id: string;
@@ -542,7 +543,7 @@ export default function LeadsPage() {
                             className="text-up hover:scale-110 transition-transform"
                             title="Chat on WhatsApp"
                           >
-                            💬
+                            <MessageCircle className="size-4" aria-hidden />
                           </a>
                         </div>
                       </td>
@@ -618,14 +619,14 @@ export default function LeadsPage() {
                           className="rounded-lg p-1 text-mute hover:text-ink hover:bg-bg-alt"
                           title="View lead details"
                         >
-                          🔍
+                          <Search className="size-4" aria-hidden />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(lead)}
                           className="rounded-lg p-1 text-mute hover:text-down hover:bg-down/10 ml-1"
                           title="Delete lead"
                         >
-                          🗑️
+                          <Trash2 className="size-4" aria-hidden />
                         </button>
                       </td>
                     </tr>
@@ -708,7 +709,7 @@ export default function LeadsPage() {
                     rel="noopener noreferrer"
                     className="text-xs text-up font-semibold hover:underline"
                   >
-                    Open Chat →
+                    Open Chat <ArrowRight className="ml-1 inline size-3.5" aria-hidden />
                   </a>
                 </div>
               </div>

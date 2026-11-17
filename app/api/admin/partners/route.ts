@@ -5,6 +5,7 @@ import { Partner } from "@/lib/models/Partner";
 import { Lead } from "@/lib/models/Lead";
 import { PartnerSchema, isReservedSlug } from "@/lib/validation/partner";
 import { requireAdmin } from "@/lib/admin-auth";
+import { generatePartnerPage } from "@/lib/page-builder/generate";
 
 export async function GET() {
   try {
@@ -73,10 +74,12 @@ export async function POST(req: Request) {
       );
     }
 
+    // Randomize the landing page once, at creation. Page views only ever read what is saved here.
     const partner = await Partner.create({
       ...data,
       slug,
       createdBy: admin.email,
+      ...generatePartnerPage(data),
     });
 
     // On-demand revalidation for instant zero-redeploy updates

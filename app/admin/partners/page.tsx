@@ -12,7 +12,7 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/Toast";
 import { slugify, isReservedSlug } from "@/lib/validation/partner";
 import { getReadableTextColor } from "@/lib/theme-utils";
-import { ArrowRight, Check, Copy, ExternalLink, X } from "lucide-react";
+import { ArrowRight, Check, Copy, ExternalLink, Shuffle, X } from "lucide-react";
 
 interface PartnerItem {
   _id: string;
@@ -39,6 +39,7 @@ export default function PartnersPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<PartnerItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PartnerItem | null>(null);
+  const [regenTarget, setRegenTarget] = useState<PartnerItem | null>(null);
   const [savedSuccessUrl, setSavedSuccessUrl] = useState<string | null>(null);
 
   // Form state
@@ -221,6 +222,23 @@ export default function PartnersPage() {
       showToast("Network error", "error");
     } finally {
       setDeleteTarget(null);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    if (!regenTarget) return;
+    try {
+      const res = await fetch(`/api/admin/partners/${regenTarget._id}/regenerate`, { method: "POST" });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        showToast(`New page generated for ${regenTarget.name}`, "success");
+      } else {
+        showToast(json.error || "Failed to regenerate page", "error");
+      }
+    } catch {
+      showToast("Network error", "error");
+    } finally {
+      setRegenTarget(null);
     }
   };
 
@@ -491,6 +509,15 @@ export default function PartnersPage() {
                           </button>
 
                           <button
+                            onClick={() => setRegenTarget(partner)}
+                            className="rounded-lg p-1.5 text-mute hover:text-accent hover:bg-bg-alt"
+                            title="Regenerate page layout"
+                            aria-label={`Regenerate page for ${partner.name}`}
+                          >
+                            <Shuffle className="size-4" aria-hidden />
+                          </button>
+
+                          <button
                             onClick={() => setDeleteTarget(partner)}
                             className="rounded-lg p-1.5 text-mute hover:text-down hover:bg-down/10"
                             title="Delete partner"
@@ -733,6 +760,16 @@ export default function PartnersPage() {
           </div>
         </form>
       </Drawer>
+
+      {/* Regenerate Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!regenTarget}
+        title="Regenerate Page"
+        description={`Pick a brand new layout, copy, theme and section order for "${regenTarget?.name}"? The current look will be replaced.`}
+        confirmText="Regenerate"
+        onConfirm={handleRegenerate}
+        onCancel={() => setRegenTarget(null)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

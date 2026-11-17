@@ -5,6 +5,7 @@ import { Lead } from "../lib/models/Lead";
 import { SiteSettings } from "../lib/models/SiteSettings";
 import { hashPassword } from "../lib/admin-auth";
 import { DEFAULT_SETTINGS } from "../lib/defaults";
+import { generatePartnerPage } from "../lib/page-builder/generate";
 
 async function seed() {
   console.log("Starting seed script...");
@@ -58,6 +59,7 @@ async function seed() {
       },
       isActive: true,
       createdBy: adminEmail,
+      ...generatePartnerPage({}),
     });
     console.log("Demo partner created: Aman Singh (/aman-singh)");
   } else {

@@ -84,14 +84,8 @@ export const PartnerSchema = z.object({
   theme: z
     .object({
       primaryColor: z.string().regex(HexColorRegex, "Invalid hex color").default("#3b36e0"),
-      secondaryColor: z.string().regex(HexColorRegex, "Invalid hex color").default("#7a5cff"),
-      accentColor: z.string().regex(HexColorRegex, "Invalid hex color").default("#3b36e0"),
     })
-    .default({
-      primaryColor: "#3b36e0",
-      secondaryColor: "#7a5cff",
-      accentColor: "#3b36e0",
-    }),
+    .default({ primaryColor: "#3b36e0" }),
 });
 
 export type PartnerFormData = z.infer<typeof PartnerSchema>;

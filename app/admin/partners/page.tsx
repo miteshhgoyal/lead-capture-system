@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/Toast";
 import { slugify, isReservedSlug } from "@/lib/validation/partner";
 import { getReadableTextColor } from "@/lib/theme-utils";
+import { ArrowRight, Check, Copy, ExternalLink, X } from "lucide-react";
 
 interface PartnerItem {
   _id: string;
@@ -26,8 +27,6 @@ interface PartnerItem {
   logoUrl?: string;
   theme: {
     primaryColor: string;
-    secondaryColor: string;
-    accentColor: string;
   };
   leadsCount: number;
   createdAt: string;
@@ -54,8 +53,6 @@ export default function PartnersPage() {
   const [mentorBio, setMentorBio] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#3b36e0");
-  const [secondaryColor, setSecondaryColor] = useState("#7a5cff");
-  const [accentColor, setAccentColor] = useState("#3b36e0");
   const [isActive, setIsActive] = useState(true);
 
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -129,8 +126,6 @@ export default function PartnersPage() {
     setMentorBio("");
     setLogoUrl("");
     setPrimaryColor("#3b36e0");
-    setSecondaryColor("#7a5cff");
-    setAccentColor("#3b36e0");
     setIsActive(true);
     setDrawerOpen(true);
   };
@@ -148,8 +143,6 @@ export default function PartnersPage() {
     setMentorBio(partner.mentorBio || "");
     setLogoUrl(partner.logoUrl || "");
     setPrimaryColor(partner.theme?.primaryColor || "#3b36e0");
-    setSecondaryColor(partner.theme?.secondaryColor || "#7a5cff");
-    setAccentColor(partner.theme?.accentColor || "#3b36e0");
     setIsActive(partner.isActive);
     setDrawerOpen(true);
   };
@@ -250,11 +243,7 @@ export default function PartnersPage() {
           mentorBio: mentorBio.trim() || undefined,
           logoUrl: logoUrl.trim() || undefined,
           isActive,
-          theme: {
-            primaryColor,
-            secondaryColor,
-            accentColor,
-          },
+          theme: { primaryColor },
         };
 
         const isEdit = !!editingPartner;
@@ -318,8 +307,8 @@ export default function PartnersPage() {
       {savedSuccessUrl && (
         <div className="relative flex flex-col items-start justify-between gap-4 rounded-2xl border border-up/30 bg-up/10 p-5 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-up text-white font-bold text-lg">
-              ✓
+            <span className="flex size-10 items-center justify-center rounded-xl bg-up text-white">
+              <Check className="size-5" aria-hidden />
             </span>
             <div>
               <h4 className="text-sm font-bold text-ink">Partner Page is LIVE Instantly!</h4>
@@ -330,23 +319,24 @@ export default function PartnersPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => copyToClipboard(savedSuccessUrl)}
-              className="rounded-xl border border-hairline bg-card px-3.5 py-2 text-xs font-semibold text-ink shadow-sm transition hover:bg-bg-alt"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-hairline bg-card px-3.5 py-2 text-xs font-semibold text-ink shadow-sm transition hover:bg-bg-alt"
             >
-              📋 Copy URL
+              <Copy className="size-3.5" aria-hidden /> Copy URL
             </button>
             <a
               href={savedSuccessUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-xl bg-up px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-up px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-110"
             >
-              🚀 Open Page →
+              Open Page <ExternalLink className="size-3.5" aria-hidden />
             </a>
             <button
               onClick={() => setSavedSuccessUrl(null)}
-              className="p-1.5 text-mute hover:text-ink text-sm"
+              className="p-1.5 text-mute hover:text-ink"
+              aria-label="Dismiss"
             >
-              ✕
+              <X className="size-4" aria-hidden />
             </button>
           </div>
         </div>
@@ -552,8 +542,8 @@ export default function PartnersPage() {
               />
               <div className="absolute right-3 top-2.5 text-xs font-semibold">
                 {slugStatus === "checking" && <span className="text-mute animate-pulse">Checking...</span>}
-                {slugStatus === "available" && <span className="text-up font-bold">✓ Available</span>}
-                {slugStatus === "unavailable" && <span className="text-down">✕ {slugReason}</span>}
+                {slugStatus === "available" && <span className="inline-flex items-center gap-1 font-bold text-up"><Check className="size-3.5" aria-hidden /> Available</span>}
+                {slugStatus === "unavailable" && <span className="inline-flex items-center gap-1 text-down"><X className="size-3.5" aria-hidden /> {slugReason}</span>}
               </div>
             </div>
             <p className="mt-1 text-[11px] text-mute font-mono">
@@ -614,9 +604,10 @@ export default function PartnersPage() {
                   <button
                     type="button"
                     onClick={() => setLogoUrl("")}
-                    className="absolute -right-1 -top-1 rounded-full bg-down p-0.5 text-white text-[10px]"
+                    className="absolute -right-1 -top-1 rounded-full bg-down p-0.5 text-white"
+                    aria-label="Remove logo"
                   >
-                    ✕
+                    <X className="size-3" aria-hidden />
                   </button>
                 </div>
               ) : (
@@ -641,64 +632,30 @@ export default function PartnersPage() {
           {/* Theme Color Pickers */}
           <div className="rounded-2xl border border-hairline bg-card/60 p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-ink">Partner Color Theme</h4>
-              <span className="text-[11px] text-mute">Custom CSS variables</span>
+              <h4 className="text-sm font-bold text-ink">Partner Brand Color</h4>
+              <span className="text-[11px] text-mute">Single colour</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[11px] font-medium text-mute mb-1">Primary Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={primaryColor}
-                    onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="size-8 rounded-lg border-0 cursor-pointer p-0"
-                  />
-                  <input
-                    type="text"
-                    value={primaryColor}
-                    onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
-                  />
-                </div>
+            <div>
+              <label className="block text-[11px] font-medium text-mute mb-1">Brand Color</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="size-8 rounded-lg border-0 cursor-pointer p-0"
+                  aria-label="Brand color"
+                />
+                <input
+                  type="text"
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
+                />
               </div>
-
-              <div>
-                <label className="block text-[11px] font-medium text-mute mb-1">Secondary Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={secondaryColor}
-                    onChange={(e) => setSecondaryColor(e.target.value)}
-                    className="size-8 rounded-lg border-0 cursor-pointer p-0"
-                  />
-                  <input
-                    type="text"
-                    value={secondaryColor}
-                    onChange={(e) => setSecondaryColor(e.target.value)}
-                    className="w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-medium text-mute mb-1">Accent Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={accentColor}
-                    onChange={(e) => setAccentColor(e.target.value)}
-                    className="size-8 rounded-lg border-0 cursor-pointer p-0"
-                  />
-                  <input
-                    type="text"
-                    value={accentColor}
-                    onChange={(e) => setAccentColor(e.target.value)}
-                    className="w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
-                  />
-                </div>
-              </div>
+              <p className="mt-1.5 text-[11px] text-mute">
+                One colour drives buttons, highlights and gradients. Secondary tones are derived automatically.
+              </p>
             </div>
 
             {/* REAL-TIME LIVE PREVIEW (Light + Dark Modes) */}
@@ -710,12 +667,12 @@ export default function PartnersPage() {
                   <span className="text-[10px] font-bold text-gray-500 block mb-2">LIGHT MODE</span>
                   <div
                     style={{
-                      backgroundColor: accentColor,
-                      color: getReadableTextColor(accentColor),
+                      backgroundColor: primaryColor,
+                      color: getReadableTextColor(primaryColor),
                     }}
                     className="rounded-lg px-3 py-1.5 text-xs font-bold text-center shadow-sm"
                   >
-                    Get Free Pass →
+                    Get Free Pass <ArrowRight className="ml-1 inline size-3" aria-hidden />
                   </div>
                 </div>
 
@@ -724,12 +681,12 @@ export default function PartnersPage() {
                   <span className="text-[10px] font-bold text-neutral-400 block mb-2">DARK MODE</span>
                   <div
                     style={{
-                      backgroundColor: accentColor,
-                      color: getReadableTextColor(accentColor),
+                      backgroundColor: primaryColor,
+                      color: getReadableTextColor(primaryColor),
                     }}
                     className="rounded-lg px-3 py-1.5 text-xs font-bold text-center shadow-sm"
                   >
-                    Get Free Pass →
+                    Get Free Pass <ArrowRight className="ml-1 inline size-3" aria-hidden />
                   </div>
                 </div>
               </div>

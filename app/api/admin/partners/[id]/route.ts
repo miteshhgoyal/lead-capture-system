@@ -96,8 +96,6 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     if (data.theme !== undefined) {
       existing.theme = {
         primaryColor: data.theme.primaryColor || existing.theme?.primaryColor || "#3b36e0",
-        secondaryColor: data.theme.secondaryColor || existing.theme?.secondaryColor || "#7a5cff",
-        accentColor: data.theme.accentColor || existing.theme?.accentColor || "#3b36e0",
       };
     }
 

@@ -1,9 +1,8 @@
 import { Schema, model, models, type Model, type Types } from "mongoose";
 
 export interface IPartnerTheme {
+  /** The partner's single brand colour. Every other tone is derived from it. */
   primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
 }
 
 export interface IPartner {
@@ -27,8 +26,6 @@ export interface IPartner {
 const partnerThemeSchema = new Schema<IPartnerTheme>(
   {
     primaryColor: { type: String, default: "#3b36e0" },
-    secondaryColor: { type: String, default: "#7a5cff" },
-    accentColor: { type: String, default: "#3b36e0" },
   },
   { _id: false }
 );

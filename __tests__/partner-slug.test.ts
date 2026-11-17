@@ -26,8 +26,6 @@ describe("Partner Slug & Validation", () => {
       telegramLink: "https://t.me/amansingh",
       theme: {
         primaryColor: "#059669",
-        secondaryColor: "#10b981",
-        accentColor: "#059669",
       },
     };
 

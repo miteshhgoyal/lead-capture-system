@@ -1,4 +1,4 @@
-import type { ContentConfig, PartnerTestimonial, SectionContentMap, SectionKey } from "./types";
+import type { ContentConfig, MetaContent, PartnerTestimonial, SectionContentMap, SectionKey } from "./types";
 
 /** Values substituted for {{placeholders}} in pool copy. */
 export interface PlaceholderVars {
@@ -71,4 +71,11 @@ export function resolveSectionContent<K extends SectionKey>(
     return { ...(filled as SectionContentMap["hero"]), headline: overrides.tagline } as SectionContentMap[K];
   }
   return filled;
+}
+
+/** Page title and description for <head> / Open Graph. A custom partner tagline wins as the description. */
+export function resolveMeta(stored: ContentConfig["meta"], vars: PlaceholderVars, tagline?: string): MetaContent {
+  const { id: _id, ...rest } = stored;
+  const filled = fillPlaceholders(rest, vars);
+  return { title: filled.title, description: tagline || filled.description };
 }

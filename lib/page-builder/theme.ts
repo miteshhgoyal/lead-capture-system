@@ -66,19 +66,22 @@ function secondaryFor(primary: string, recipe: PaletteRecipe): string {
  * (--accent, --accent-2, --accent-ink, --bg-alt) and Tailwind's radius scale, so every
  * component picks them up without knowing about themes.
  */
-export function buildThemeVars(primaryColor: string, theme: ThemeConfig): Record<string, string> {
+export function buildThemeVars(primaryColor: string | undefined, theme: ThemeConfig): Record<string, string> {
   const recipe = findPalette(theme.paletteId);
   const radii = RADIUS_VALUES[theme.radius] ?? RADIUS_VALUES.soft;
   const vars: Record<string, string> = {
-    "--accent": primaryColor,
-    "--accent-2": secondaryFor(primaryColor, recipe),
-    "--accent-ink": getReadableTextColor(primaryColor),
     "--radius-xl": radii.xl,
     "--radius-2xl": radii["2xl"],
     "--radius-3xl": radii["3xl"],
   };
-  if (recipe.surfaceTint > 0) {
-    vars["--bg-alt"] = `color-mix(in oklab, var(--bg) ${100 - recipe.surfaceTint}%, var(--accent) ${recipe.surfaceTint}%)`;
+  // Without a partner brand colour the site's own accent is kept.
+  if (primaryColor) {
+    vars["--accent"] = primaryColor;
+    vars["--accent-2"] = secondaryFor(primaryColor, recipe);
+    vars["--accent-ink"] = getReadableTextColor(primaryColor);
+    if (recipe.surfaceTint > 0) {
+      vars["--bg-alt"] = `color-mix(in oklab, var(--bg) ${100 - recipe.surfaceTint}%, var(--accent) ${recipe.surfaceTint}%)`;
+    }
   }
   return vars;
 }

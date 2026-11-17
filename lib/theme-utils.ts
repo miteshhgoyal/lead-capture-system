@@ -1,8 +1,3 @@
-export interface PartnerTheme {
-  /** The partner's single brand colour. */
-  primaryColor: string;
-}
-
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const clean = hex.replace("#", "").trim();
   if (clean.length === 3) {
@@ -74,21 +69,4 @@ export function hslToHex(h: number, s: number, l: number): string {
 export function deriveSecondary(primary: string, hueShift = 24): string {
   const { h, s, l } = hexToHsl(primary);
   return hslToHex(h + hueShift, s, l);
-}
-
-/** Generates CSS custom properties for a partner's single brand colour in Light and Dark modes. */
-export function generatePartnerThemeCss(theme?: PartnerTheme): string {
-  if (!theme || !theme.primaryColor) return "";
-  const accent = theme.primaryColor;
-  const accentInk = getReadableTextColor(accent);
-  const vars = `
-      --accent: ${accent} !important;
-      --accent-2: ${deriveSecondary(accent)} !important;
-      --accent-ink: ${accentInk} !important;`;
-  return `
-    :root {${vars}
-    }
-    .dark {${vars}
-    }
-  `;
 }

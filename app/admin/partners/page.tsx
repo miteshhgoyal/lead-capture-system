@@ -12,7 +12,15 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/Toast";
 import { slugify, isReservedSlug } from "@/lib/validation/partner";
 import { getReadableTextColor } from "@/lib/theme-utils";
-import { ArrowRight, Check, Copy, ExternalLink, Shuffle, X } from "lucide-react";
+import { ArrowRight, Check, Copy, ExternalLink, Plus, Shuffle, Trash2, X } from "lucide-react";
+
+interface TestimonialInput {
+  name: string;
+  role?: string;
+  quote: string;
+}
+
+const MAX_TESTIMONIALS = 6;
 
 interface PartnerItem {
   _id: string;
@@ -25,6 +33,7 @@ interface PartnerItem {
   tagline?: string;
   mentorBio?: string;
   logoUrl?: string;
+  testimonials?: TestimonialInput[];
   theme: {
     primaryColor: string;
   };
@@ -52,6 +61,7 @@ export default function PartnersPage() {
   const [zoomLink, setZoomLink] = useState("");
   const [tagline, setTagline] = useState("");
   const [mentorBio, setMentorBio] = useState("");
+  const [testimonials, setTestimonials] = useState<TestimonialInput[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#3b36e0");
   const [isActive, setIsActive] = useState(true);
@@ -125,6 +135,7 @@ export default function PartnersPage() {
     setZoomLink("");
     setTagline("");
     setMentorBio("");
+    setTestimonials([]);
     setLogoUrl("");
     setPrimaryColor("#3b36e0");
     setIsActive(true);
@@ -142,6 +153,7 @@ export default function PartnersPage() {
     setZoomLink(partner.zoomLink || "");
     setTagline(partner.tagline || "");
     setMentorBio(partner.mentorBio || "");
+    setTestimonials(partner.testimonials ?? []);
     setLogoUrl(partner.logoUrl || "");
     setPrimaryColor(partner.theme?.primaryColor || "#3b36e0");
     setIsActive(partner.isActive);
@@ -259,6 +271,9 @@ export default function PartnersPage() {
           zoomLink: zoomLink.trim() || undefined,
           tagline: tagline.trim() || undefined,
           mentorBio: mentorBio.trim() || undefined,
+          testimonials: testimonials
+            .map((t) => ({ name: t.name.trim(), role: t.role?.trim() || undefined, quote: t.quote.trim() }))
+            .filter((t) => t.name && t.quote),
           logoUrl: logoUrl.trim() || undefined,
           isActive,
           theme: { primaryColor },
@@ -618,6 +633,59 @@ export default function PartnersPage() {
               className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
           </Field>
+
+          {/* Testimonials (shown on the page only when at least one is added) */}
+          <div className="rounded-2xl border border-hairline bg-card/60 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-ink">Student Testimonials</h4>
+                <p className="text-[11px] text-mute">
+                  Only add real feedback you have permission to publish. The section stays hidden while this list is empty.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={testimonials.length >= MAX_TESTIMONIALS}
+                onClick={() => setTestimonials((prev) => [...prev, { name: "", role: "", quote: "" }])}
+              >
+                <Plus className="size-3.5" aria-hidden /> Add
+              </Button>
+            </div>
+            {testimonials.map((t, i) => (
+              <div key={i} className="space-y-2 rounded-xl border border-hairline bg-bg p-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Input
+                    placeholder="Name"
+                    value={t.name}
+                    maxLength={80}
+                    onChange={(e) => setTestimonials((prev) => prev.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))}
+                  />
+                  <Input
+                    placeholder="Role or city (optional)"
+                    value={t.role ?? ""}
+                    maxLength={80}
+                    onChange={(e) => setTestimonials((prev) => prev.map((x, j) => (j === i ? { ...x, role: e.target.value } : x)))}
+                  />
+                </div>
+                <textarea
+                  rows={2}
+                  placeholder="What they said"
+                  value={t.quote}
+                  maxLength={400}
+                  onChange={(e) => setTestimonials((prev) => prev.map((x, j) => (j === i ? { ...x, quote: e.target.value } : x)))}
+                  className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setTestimonials((prev) => prev.filter((_, j) => j !== i))}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-down hover:underline"
+                >
+                  <Trash2 className="size-3.5" aria-hidden /> Remove
+                </button>
+              </div>
+            ))}
+          </div>
 
           {/* Brand Logo Upload */}
           <div className="space-y-2">

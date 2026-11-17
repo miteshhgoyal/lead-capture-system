@@ -10,7 +10,8 @@
 import { dbConnect } from "../lib/db";
 import { Partner, type IPartner } from "../lib/models/Partner";
 import { generatePartnerPage } from "../lib/page-builder/generate";
-import { hasPageConfig, pageConfigUpdate } from "../lib/page-builder/persist";
+import { pageConfigUpdate } from "../lib/page-builder/persist";
+import { hasPageConfig } from "../lib/page-builder/validate";
 
 async function main() {
   const legacy = process.argv.includes("--legacy");

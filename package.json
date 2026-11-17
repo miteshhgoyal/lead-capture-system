@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "tsx --test __tests__/**/*.test.ts",
-    "seed": "tsx --env-file=.env scripts/seed.ts"
+    "seed": "tsx --env-file=.env scripts/seed.ts",
+    "migrate": "tsx --env-file=.env scripts/migrate.ts"
   },
   "dependencies": {
     "cloudinary": "^2.11.0",

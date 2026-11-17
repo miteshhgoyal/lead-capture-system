@@ -93,6 +93,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     if (data.mentorBio !== undefined) existing.mentorBio = data.mentorBio;
     if (data.logoUrl !== undefined) existing.logoUrl = data.logoUrl;
     if (data.faviconUrl !== undefined) existing.faviconUrl = data.faviconUrl;
+    if (data.testimonials !== undefined) existing.testimonials = data.testimonials;
     if (data.theme !== undefined) {
       existing.theme = {
         primaryColor: data.theme.primaryColor || existing.theme?.primaryColor || "#3b36e0",

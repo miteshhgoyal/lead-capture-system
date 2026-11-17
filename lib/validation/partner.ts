@@ -77,6 +77,16 @@ export const PartnerSchema = z.object({
     .or(z.literal(""))
     .optional(),
   isActive: z.boolean().default(true),
+  testimonials: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1, "Testimonial name is required").max(80),
+        role: z.string().trim().max(80).optional(),
+        quote: z.string().trim().min(10, "Testimonial is too short").max(400),
+      })
+    )
+    .max(6, "At most 6 testimonials")
+    .optional(),
   tagline: z.string().trim().max(200).optional(),
   mentorBio: z.string().trim().max(1000).optional(),
   logoUrl: z.string().trim().optional(),

@@ -1,4 +1,11 @@
 import { Schema, model, models, type Model, type Types } from "mongoose";
+import type {
+  ContentConfig,
+  LayoutConfig,
+  PartnerTestimonial,
+  SectionKey,
+  ThemeConfig,
+} from "../page-builder/types";
 
 export interface IPartnerTheme {
   /** The partner's single brand colour. Every other tone is derived from it. */
@@ -18,6 +25,13 @@ export interface IPartner {
   logoUrl?: string;
   faviconUrl?: string;
   theme: IPartnerTheme;
+  testimonials?: PartnerTestimonial[];
+  /** Generated once per partner (see lib/page-builder/generate.ts) and read on every render. */
+  layoutConfig?: LayoutConfig | null;
+  contentConfig?: ContentConfig | null;
+  themeConfig?: ThemeConfig | null;
+  sectionOrder?: SectionKey[] | null;
+  seed?: number | null;
   createdBy?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +40,15 @@ export interface IPartner {
 const partnerThemeSchema = new Schema<IPartnerTheme>(
   {
     primaryColor: { type: String, default: "#3b36e0" },
+  },
+  { _id: false }
+);
+
+const testimonialSchema = new Schema<PartnerTestimonial>(
+  {
+    name: { type: String, required: true, trim: true },
+    role: { type: String, trim: true },
+    quote: { type: String, required: true, trim: true },
   },
   { _id: false }
 );
@@ -48,6 +71,12 @@ const partnerSchema = new Schema<IPartner>(
     logoUrl: { type: String, trim: true },
     faviconUrl: { type: String, trim: true },
     theme: { type: partnerThemeSchema, default: () => ({}) },
+    testimonials: { type: [testimonialSchema], default: [] },
+    layoutConfig: { type: Schema.Types.Mixed, default: null },
+    contentConfig: { type: Schema.Types.Mixed, default: null },
+    themeConfig: { type: Schema.Types.Mixed, default: null },
+    sectionOrder: { type: Schema.Types.Mixed, default: null },
+    seed: { type: Number, default: null },
     createdBy: { type: String, trim: true },
   },
   {

@@ -11,6 +11,7 @@ import {
   type MiddleSectionKey,
   type PartnerPageConfig,
   type PartnerTestimonial,
+  type StatItem,
   type SectionKey,
   type ThemeConfig,
 } from "./types";
@@ -75,6 +76,27 @@ export function buildContent(choose: <K extends SectionKey | "meta">(key: K) => 
   return out as unknown as ContentConfig;
 }
 
+const round = (n: number, step: number) => Math.round(n / step) * step;
+const between = (rng: Rng, min: number, max: number) => min + rng() * (max - min);
+
+/** Per-partner stat figures, so two partners' pages never show the same numbers. Saved with the page. */
+export function randomStats(rng: Rng): StatItem[] {
+  const students = round(between(rng, 18000, 95000), 500);
+  const rating = Math.round(between(rng, 4.6, 4.9) * 10) / 10;
+  const feedback = Math.round(between(rng, 89, 98));
+  const fourth: StatItem[] = [
+    { text: "100%", label: "Free Live Access" },
+    { end: round(between(rng, 120, 900), 10), suffix: "+", label: "Live Sessions Hosted" },
+    { end: Math.round(between(rng, 12, 40)), suffix: "+", label: "Countries Reached" },
+  ];
+  return [
+    { end: students, suffix: "+", label: pick(rng, ["Students Mentored", "Learners Taught", "Traders Trained"]) },
+    { end: rating, decimals: 1, suffix: " / 5", label: pick(rng, ["Average Learner Rating", "Average Session Rating"]) },
+    { end: feedback, suffix: "%", label: pick(rng, ["Positive Feedback Rate", "Learner Satisfaction"]) },
+    pick(rng, fourth),
+  ];
+}
+
 /**
  * Picks one layout variant and one content set per section, a theme and a section order.
  * Runs ONCE per partner (creation, backfill or an admin "Regenerate page"); the result is saved
@@ -101,6 +123,8 @@ export function generatePartnerPage(partner: GenerateSubject = {}, options: Gene
   const contentConfig = buildContent((key) => Math.floor(rng() * CONTENT_POOLS[key].length));
   const themeConfig = pickTheme(rng);
   const sectionOrder = pickSectionOrder(rng, (partner.testimonials?.length ?? 0) > 0);
+  // Drawn last so every other choice for a given seed is unchanged.
+  contentConfig.stats = { ...contentConfig.stats, items: randomStats(rng) };
 
   return { seed, layoutConfig, contentConfig, themeConfig, sectionOrder };
 }

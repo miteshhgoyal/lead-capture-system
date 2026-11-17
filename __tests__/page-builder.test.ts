@@ -65,6 +65,25 @@ describe("generatePartnerPage", () => {
     assert.ok(new Set(pages.map((p) => p.contentConfig.faq.id)).size >= 3);
   });
 
+  it("gives each partner its own stat figures, saved in the content config", () => {
+    const first = pages.map((p) => p.contentConfig.stats.items[0].end);
+    assert.ok(new Set(first).size >= 40, "student counts barely vary");
+    for (const { contentConfig } of pages) {
+      const [students, rating, feedback] = contentConfig.stats.items;
+      assert.equal(contentConfig.stats.items.length, 4);
+      assert.ok(students.end! >= 18000 && students.end! <= 95000);
+      assert.ok(rating.end! >= 4.6 && rating.end! <= 4.9);
+      assert.ok(feedback.end! >= 89 && feedback.end! <= 98);
+    }
+    assert.ok(new Set(pages.map((p) => JSON.stringify(p.contentConfig.stats.items))).size >= 45);
+  });
+
+  it("legacy mode keeps the original stat figures", () => {
+    const { items } = generatePartnerPage({}, { legacy: true }).contentConfig.stats;
+    assert.equal(items[0].end, 60000);
+    assert.equal(items[2].end, 92);
+  });
+
   it("keeps navbar, hero, cta, footer in place and never repeats a section", () => {
     for (const { sectionOrder } of pages) {
       assert.deepEqual(sectionOrder.slice(0, 2), ["navbar", "hero"]);

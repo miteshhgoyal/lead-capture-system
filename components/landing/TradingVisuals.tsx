@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { usePrefersReducedMotion } from "./motion/hooks";
 
 export function CountUp({
   end,
@@ -16,6 +17,7 @@ export function CountUp({
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,6 +36,10 @@ export function CountUp({
 
   useEffect(() => {
     if (!hasStarted) return;
+    if (reducedMotion) {
+      setVal(end);
+      return;
+    }
     let startTimestamp: number | null = null;
     let frameId: number;
 
@@ -51,7 +57,7 @@ export function CountUp({
 
     frameId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frameId);
-  }, [hasStarted, end, duration]);
+  }, [hasStarted, end, duration, reducedMotion]);
 
   return (
     <span ref={ref}>

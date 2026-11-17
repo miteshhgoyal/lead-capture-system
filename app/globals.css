@@ -536,3 +536,76 @@ noscript .fg-draw {
   .fg-bar, .f-bar { transform: scaleX(var(--p, 0)); animation: none !important; }
   .fg-hi { animation: none !important; }
 }
+
+/* ── Landing: animation presets (components/landing/motion) ─────────────────── */
+.rt-reveal {
+  opacity: 0;
+  transform: translate3d(0, var(--rt-dist, 14px), 0);
+  filter: blur(var(--rt-blur, 0px));
+  transition:
+    opacity var(--rt-dur, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--rt-delay, 0ms),
+    transform var(--rt-dur, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--rt-delay, 0ms),
+    filter var(--rt-dur, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--rt-delay, 0ms);
+}
+.rt-reveal.is-in { opacity: 1; transform: none; filter: none; }
+.rt-reveal-eager { animation: rt-rise var(--rt-dur, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--rt-delay, 0ms) both; }
+@keyframes rt-rise {
+  from { opacity: 0; transform: translate3d(0, var(--rt-dist, 14px), 0); filter: blur(var(--rt-blur, 0px)); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+.rt-text .rt-wrap { display: inline-block; white-space: nowrap; }
+.rt-text .rt-u { display: inline-block; }
+.rt-text[data-state="hidden"] .rt-u { opacity: 0; }
+.rt-text[data-state="shown"] .rt-u {
+  animation-duration: var(--rt-dur, 600ms);
+  animation-delay: var(--d, 0ms);
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.rt-text[data-mode="words"][data-state="shown"] .rt-u { animation-name: rt-word-in; }
+.rt-text[data-mode="mask"] .rt-wrap { overflow: hidden; vertical-align: bottom; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.rt-text[data-mode="mask"][data-state="hidden"] .rt-u { opacity: 1; transform: translateY(108%); }
+.rt-text[data-mode="mask"][data-state="shown"] .rt-u { animation-name: rt-mask-up; }
+.rt-text[data-mode="typewriter"][data-state="shown"] .rt-u { animation-name: rt-type; animation-duration: 1ms; animation-timing-function: steps(1, end); }
+.rt-text[data-mode="blur-letters"][data-state="shown"] .rt-u { animation-name: rt-blur-in; }
+@keyframes rt-word-in { from { opacity: 0; transform: translateY(0.45em); } to { opacity: 1; transform: none; } }
+@keyframes rt-mask-up { from { transform: translateY(108%); } to { transform: none; } }
+@keyframes rt-type { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rt-blur-in { from { opacity: 0; filter: blur(10px); transform: translateY(0.3em); } to { opacity: 1; filter: none; transform: none; } }
+
+.rt-gradient-text {
+  background-image: linear-gradient(100deg, var(--accent), var(--accent-2), var(--accent));
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+[data-anim]:not([data-anim="none"]) .rt-gradient-text { animation: rt-shimmer 6s linear infinite; }
+@keyframes rt-shimmer { to { background-position: -220% 0; } }
+
+[data-lift="true"] .rt-lift { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease; }
+[data-lift="true"] .rt-lift:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+
+.rt-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.rt-marquee-track { display: flex; width: max-content; animation: rt-marquee var(--rt-marquee-dur, 32s) linear infinite; }
+.rt-marquee:hover .rt-marquee-track { animation-play-state: paused; }
+.rt-marquee-group { display: flex; flex-shrink: 0; gap: var(--rt-gap, 16px); padding-right: var(--rt-gap, 16px); }
+@keyframes rt-marquee { to { transform: translateX(-50%); } }
+
+.rt-float { animation: rt-float 9s ease-in-out infinite alternate; }
+@keyframes rt-float {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(0, -18px, 0) rotate(6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rt-reveal, .rt-reveal-eager, .rt-text .rt-u { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; transition: none !important; }
+  .rt-gradient-text, .rt-marquee-track, .rt-float { animation: none !important; }
+  .rt-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  [data-lift="true"] .rt-lift:hover { transform: none; }
+}

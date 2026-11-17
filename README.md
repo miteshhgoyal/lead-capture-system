@@ -34,9 +34,6 @@ A high-converting, multi-partner lead capture and attribution system for trading
    - **Partner Performance Leaderboard** (`/admin/performance`): Live leaderboard ranking partners by total leads, 7-day velocity, 30-day velocity, webinar attendance rate, and audience share % with 1-click drill-down to filtered leads.
    - **System Settings** (`/admin/settings`): Configure default root page copy, default Telegram link, and change administrator password.
 
-5. **Optional Wildcard Subdomain Routing**:
-   - Internal URL rewrite engine in Next.js Proxy (`proxy.ts`): `{slug}.ROOT_DOMAIN` transparently serves `/{slug}` without client redirection when enabled.
-
 ---
 
 ## 🚀 Getting Started
@@ -65,10 +62,6 @@ ADMIN_SESSION_SECRET=qAfSXZIbpEvKOB5AS5xfeHMLN1QqADKE3b1tBflyxeC64ZVNvsW3B/dtk9x
 
 # Canonical Public URL
 NEXT_PUBLIC_SITE_URL=https://freecourselink.com
-
-# Wildcard Subdomain Routing (Optional)
-ENABLE_SUBDOMAINS=false
-ROOT_DOMAIN=freecourselink.com
 
 # Cloudinary Storage for Partner Logos (Optional: falls back to persistent local /public/uploads)
 CLOUDINARY_CLOUD_NAME=
@@ -121,33 +114,6 @@ Run production build:
 ```bash
 pnpm build
 ```
-
----
-
-## 🌐 Wildcard Subdomains Setup (`{slug}.domain.com`)
-
-The system supports running partner landing pages under custom subdomains (e.g. `aman-singh.freecourselink.com`) using Next.js Proxy rewrites:
-
-### Step 1: Enable Environment Flags
-In `.env`:
-```env
-ENABLE_SUBDOMAINS=true
-ROOT_DOMAIN=freecourselink.com
-```
-
-### Step 2: Wildcard DNS Record
-In your DNS provider (Cloudflare, Namecheap, GoDaddy, Route53):
-- **Type**: `CNAME` or `A`
-- **Name**: `*` (or `*.freecourselink.com`)
-- **Target**: Points to your server IP or platform CNAME (e.g. `cname.vercel-dns.com` or your VPS IP)
-
-### Step 3: Wildcard SSL Certificate
-- **Cloudflare**: Enabled automatically with Universal SSL for all first-level subdomains (`*.domain.com`).
-- **Vercel / Railway / Render**: Add `*.freecourselink.com` to Domains; the platform automatically provisions a Let's Encrypt Wildcard SSL certificate.
-- **Custom VPS (Nginx + Certbot)**:
-  ```bash
-  certbot certonly --manual --preferred-challenges dns -d "freecourselink.com" -d "*.freecourselink.com"
-  ```
 
 ---
 

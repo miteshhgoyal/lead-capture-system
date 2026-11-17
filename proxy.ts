@@ -22,42 +22,6 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Wildcard Subdomain Rewriting (optional, enabled by env flag)
-  const enableSubdomains = process.env.ENABLE_SUBDOMAINS === "true";
-  const rootDomain = process.env.ROOT_DOMAIN; // e.g. "freecourselink.com" or "localhost:3000"
-
-  if (enableSubdomains && rootDomain) {
-    const host = request.headers.get("host") || "";
-    // Clean port from host if rootDomain doesn't specify one
-    const cleanHost = host.toLowerCase().split(":")[0];
-    const cleanRoot = rootDomain.toLowerCase().split(":")[0];
-
-    if (cleanHost !== cleanRoot && cleanHost.endsWith(`.${cleanRoot}`)) {
-      const subdomain = cleanHost.slice(0, -(cleanRoot.length + 1));
-      const ignoredSubdomains = ["www", "admin", "api", "mail", "app", "dashboard"];
-
-      if (subdomain && !ignoredSubdomains.includes(subdomain)) {
-        // Rewrite subdomain root to partner route: partner.domain.com/ -> /partner
-        // But do not rewrite static files or api routes
-        if (
-          !pathname.startsWith("/api") &&
-          !pathname.startsWith("/_next") &&
-          !pathname.startsWith("/static") &&
-          !pathname.startsWith("/public") &&
-          !pathname.startsWith("/uploads") &&
-          !pathname.includes(".")
-        ) {
-          const rewriteUrl = new URL(`/${subdomain}${pathname === "/" ? "" : pathname}`, request.url);
-          const response = NextResponse.rewrite(rewriteUrl, {
-            request: { headers: requestHeaders },
-          });
-          applySecurityHeaders(response);
-          return response;
-        }
-      }
-    }
-  }
-
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,

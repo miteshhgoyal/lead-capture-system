@@ -91,13 +91,13 @@ export function AreaChartVisual() {
   const areaD = `${pathD} L 600 180 L 0 180 Z`;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-hairline bg-card p-5">
-      <div className="flex items-center justify-between pb-3">
-        <div>
+    <div className="relative w-full overflow-hidden rounded-2xl border border-hairline bg-card p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-3">
+        <div className="min-w-0">
           <span className="text-xs font-semibold text-mute">Institutional Breakout Model</span>
-          <div className="text-lg font-bold text-ink">Price Action Architecture</div>
+          <div className="text-base font-bold text-ink sm:text-lg">Price Action Architecture</div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-up/10 px-2.5 py-1 text-xs font-semibold text-up">
+        <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-up/10 px-2.5 py-1 text-xs font-semibold text-up">
           <span className="size-1.5 rounded-full bg-up animate-pulse" />
           +1:3.4 Risk-to-Reward
         </div>
@@ -141,10 +141,10 @@ export function AreaChartVisual() {
         </svg>
 
         {/* Callout markers */}
-        <div className="absolute left-[38%] top-[30%] -translate-x-1/2 -translate-y-full rounded-md border border-hairline bg-bg px-2 py-0.5 text-[10px] font-semibold text-ink shadow-sm">
+        <div className="absolute left-[38%] top-[30%] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md border border-hairline bg-bg px-2 py-0.5 text-[10px] font-semibold text-ink shadow-sm">
           Liquidity Sweep Entry
         </div>
-        <div className="absolute right-4 top-2 rounded-md border border-up/30 bg-up/10 px-2 py-0.5 text-[10px] font-bold text-up shadow-sm">
+        <div className="absolute right-0 top-2 whitespace-nowrap rounded-md border border-up/30 bg-up/10 px-2 py-0.5 text-[10px] font-bold text-up shadow-sm sm:right-4">
           Take Profit Target Hit
         </div>
       </div>
@@ -194,20 +194,20 @@ export function CandlestickVisual() {
 
 export function RiskRewardVisual() {
   return (
-    <div className="rounded-2xl border border-hairline bg-card p-5">
-      <div className="flex items-center justify-between">
+    <div className="rounded-2xl border border-hairline bg-card p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <span className="text-xs font-semibold text-mute">Disciplined Sizing</span>
         <span className="text-xs font-bold text-up">1 : 3 R/R Guaranteed Model</span>
       </div>
       <div className="mt-3 flex h-6 w-full overflow-hidden rounded-xl bg-bg-alt p-1">
-        <div className="flex w-1/4 items-center justify-center rounded-lg bg-down/20 text-[10px] font-bold text-down">
+        <div className="flex w-1/4 items-center justify-center whitespace-nowrap rounded-lg bg-down/20 text-[10px] font-bold text-down">
           1x Risk
         </div>
-        <div className="ml-1 flex w-3/4 items-center justify-center rounded-lg bg-up/20 text-[10px] font-bold text-up">
+        <div className="ml-1 flex w-3/4 items-center justify-center whitespace-nowrap rounded-lg bg-up/20 text-[10px] font-bold text-up">
           3x Target Return
         </div>
       </div>
-      <div className="mt-2 flex justify-between text-[11px] text-mute">
+      <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-1 text-[11px] text-mute">
         <span>Stop Loss: Max 1% Equity</span>
         <span>Target: 3% - 5% Profit</span>
       </div>

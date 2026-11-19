@@ -18,6 +18,12 @@ interface LeadFormProps {
   className?: string;
 }
 
+/*
+ * Mobile notes:
+ *  - Controls use text-base on mobile (16px) so iOS Safari does not zoom the page on focus; sm:text-sm restores the compact size.
+ *  - The phone row uses a fixed-width country select + min-w-0 input so it cannot overflow at 320px.
+ *  - scroll-mt keeps the form clear of the sticky navbar when "Get Free Pass" scrolls to it.
+ */
 export function LeadForm({
   partnerSlug = "direct",
   partnerName: _partnerName = "Direct",
@@ -131,7 +137,7 @@ export function LeadForm({
     return (
       <div
         id="lead-form"
-        className={`relative overflow-hidden rounded-3xl border border-hairline bg-card p-6 shadow-2xl transition-all sm:p-8 ${className}`}
+        className={`relative scroll-mt-24 overflow-hidden rounded-3xl border border-hairline bg-card p-5 shadow-2xl transition-all sm:p-8 ${className}`}
       >
         <Confetti />
 
@@ -154,16 +160,16 @@ export function LeadForm({
             PASS CONFIRMED
           </span>
 
-          <h3 className="mt-3 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+          <h3 className="mt-3 max-w-full break-words text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             You&apos;re In, {name.split(" ")[0]}!
           </h3>
 
-          <p className="mt-2 text-sm text-mute">
+          <p className="mt-2 max-w-full break-words text-sm text-mute">
             We&apos;ve sent your exclusive Zoom link and webinar pass to{" "}
             <span className="font-semibold text-ink">
               {selectedCountry.dialCode} {phone}
             </span>{" "}
-            via WhatsApp and to <span className="font-semibold text-ink">{email}</span>.
+            via WhatsApp and to <span className="break-all font-semibold text-ink">{email}</span>.
           </p>
 
           {/* Community links: shown only here, after the lead is saved */}
@@ -188,7 +194,7 @@ export function LeadForm({
                     href={submittedTelegramLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98]"
+                    className="inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98] sm:px-6"
                   >
                     <Send className="size-5 shrink-0" aria-hidden />
                     Join Telegram Community
@@ -201,8 +207,8 @@ export function LeadForm({
                     rel="noopener noreferrer"
                     className={
                       submittedTelegramLink
-                        ? "inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-accent px-6 py-3.5 text-base font-semibold text-accent transition-all hover:bg-accent/10 active:scale-[0.98]"
-                        : "inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98]"
+                        ? "inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-accent px-4 py-3.5 text-base font-semibold text-accent transition-all hover:bg-accent/10 active:scale-[0.98] sm:px-6"
+                        : "inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-accent-ink shadow-lg shadow-accent/25 transition-all hover:brightness-110 active:scale-[0.98] sm:px-6"
                     }
                   >
                     <MessageCircle className="size-5 shrink-0" aria-hidden />
@@ -213,7 +219,7 @@ export function LeadForm({
             </>
           )}
 
-          <div className="mt-6 flex items-center justify-center gap-1.5 border-t border-hairline pt-4 text-xs text-mute">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-1.5 border-t border-hairline pt-4 text-xs text-mute">
             <Lock className="size-3.5" aria-hidden /> 100% Free · Join 60,000+ Enrolled Students
           </div>
         </div>
@@ -221,23 +227,30 @@ export function LeadForm({
     );
   }
 
+  const controlBase =
+    "w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-base text-ink placeholder:text-faint transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 sm:text-sm";
+
   return (
     <div
       id="lead-form"
-      className={`relative rounded-3xl border border-hairline bg-card p-6 shadow-2xl transition-all sm:p-8 ${className}`}
+      className={`relative scroll-mt-24 rounded-3xl border border-hairline bg-card p-5 shadow-2xl transition-all sm:p-8 ${className}`}
     >
-      {/* Decorative accent wash */}
-      <div className="pointer-events-none absolute -right-20 -top-20 size-48 rounded-full bg-accent/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 -left-20 size-48 rounded-full bg-accent-2/10 blur-3xl" />
+      {/* Decorative accent wash (clipped so it can never cause sideways scroll) */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+        <div className="absolute -right-20 -top-20 size-48 rounded-full bg-accent/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 size-48 rounded-full bg-accent-2/10 blur-3xl" />
+      </div>
 
       <div className="relative z-10">
         <div className="mb-5">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent">
-            <span className="relative flex size-2">
+          <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent">
+            <span className="relative flex size-2 shrink-0">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-accent" />
             </span>
-            LIMITED SEATS AVAILABLE · LIVE WEBINAR
+            <span>
+              LIMITED SEATS AVAILABLE<span className="hidden sm:inline"> · LIVE WEBINAR</span>
+            </span>
           </div>
           <h3 className="mt-2.5 text-xl font-bold tracking-tight text-ink sm:text-2xl">
             Claim Your Free VIP Pass
@@ -273,13 +286,14 @@ export function LeadForm({
             <input
               type="text"
               required
+              autoComplete="name"
               placeholder="e.g. Rahul Sharma"
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
                 if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: "" }));
               }}
-              className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              className={controlBase}
             />
             {fieldErrors.name && (
               <p className="mt-1 text-[11px] text-down">{fieldErrors.name}</p>
@@ -301,7 +315,8 @@ export function LeadForm({
                     const match = COUNTRIES.find((c) => c.dialCode === e.target.value);
                     if (match) setSelectedCountry(match);
                   }}
-                  className="h-full rounded-xl border border-hairline bg-bg px-2.5 py-2.5 text-xs font-medium text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 sm:text-sm"
+                  aria-label="Country code"
+                  className="h-full w-28 rounded-xl border border-hairline bg-bg px-2.5 py-2.5 text-base font-medium text-ink focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 sm:w-auto sm:text-sm"
                 >
                   {COUNTRIES.map((c, i) => (
                     <option key={`${c.code}-${i}`} value={c.dialCode}>
@@ -314,6 +329,8 @@ export function LeadForm({
               {/* Number Input */}
               <input
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
                 required
                 placeholder="98765 43210"
                 value={phone}
@@ -321,7 +338,7 @@ export function LeadForm({
                   setPhone(e.target.value);
                   if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: "" }));
                 }}
-                className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className={`min-w-0 ${controlBase}`}
               />
             </div>
             {fieldErrors.phone && (
@@ -341,7 +358,7 @@ export function LeadForm({
                 setCapital(e.target.value);
                 if (fieldErrors.capital) setFieldErrors((prev) => ({ ...prev, capital: "" }));
               }}
-              className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              className={controlBase}
             >
               <option value="" disabled>
                 Select your capital range
@@ -364,6 +381,8 @@ export function LeadForm({
             </label>
             <input
               type="email"
+              inputMode="email"
+              autoComplete="email"
               required
               placeholder="rahul@gmail.com"
               value={email}
@@ -371,7 +390,7 @@ export function LeadForm({
                 setEmail(e.target.value);
                 if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: "" }));
               }}
-              className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              className={controlBase}
             />
             {fieldErrors.email && (
               <p className="mt-1 text-[11px] text-down">{fieldErrors.email}</p>
@@ -380,12 +399,13 @@ export function LeadForm({
 
           {/* 5. Age & Profession (2-column layout) */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold text-ink">
                 Age <span className="text-down">*</span>
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min={18}
                 max={80}
                 required
@@ -394,14 +414,14 @@ export function LeadForm({
                   setAge(e.target.value);
                   if (fieldErrors.age) setFieldErrors((prev) => ({ ...prev, age: "" }));
                 }}
-                className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className={controlBase}
               />
               {fieldErrors.age && (
                 <p className="mt-1 text-[11px] text-down">{fieldErrors.age}</p>
               )}
             </div>
 
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold text-ink">
                 Profession <span className="text-down">*</span>
               </label>
@@ -413,7 +433,7 @@ export function LeadForm({
                   if (fieldErrors.profession)
                     setFieldErrors((prev) => ({ ...prev, profession: "" }));
                 }}
-                className="w-full rounded-xl border border-hairline bg-bg px-3 py-2.5 text-xs text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 sm:text-sm"
+                className={controlBase}
               >
                 <option value="" disabled>
                   Select
@@ -441,7 +461,7 @@ export function LeadForm({
                 const match = COUNTRIES.find((c) => c.name === e.target.value);
                 if (match) setSelectedCountry(match);
               }}
-              className="w-full rounded-xl border border-hairline bg-bg px-3.5 py-2.5 text-sm text-ink transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              className={controlBase}
             >
               {COUNTRIES.map((c) => (
                 <option key={c.name} value={c.name}>
@@ -487,7 +507,7 @@ export function LeadForm({
           </button>
 
           {/* 8. Footer Trust Line */}
-          <p className="flex items-center justify-center gap-1.5 pt-1 text-center text-xs text-mute">
+          <p className="flex flex-wrap items-center justify-center gap-1.5 pt-1 text-center text-xs text-mute">
             <Lock className="size-3.5" aria-hidden /> 100% Free · Join 60,000+ Enrolled Students
           </p>
         </form>

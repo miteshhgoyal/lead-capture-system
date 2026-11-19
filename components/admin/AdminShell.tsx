@@ -91,7 +91,7 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
   const pageTitle = title ?? currentItem?.label ?? "Overview";
 
   const navContent = (
-    <div className="flex h-full flex-col justify-between">
+    <div className="flex h-full flex-col justify-between overflow-y-auto">
       <div>
         <div className="flex h-16 items-center gap-3 px-6 border-b border-hairline">
           <div className="flex size-9 items-center justify-center rounded-xl bg-accent text-accent-ink font-bold text-base shadow-sm">
@@ -156,7 +156,8 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
 
   return (
     <ToastProvider>
-      <div className="flex h-screen bg-bg text-ink antialiased overflow-hidden font-sans">
+      {/* h-dvh (not h-screen) so the bottom of the layout is not hidden behind mobile browser bars */}
+      <div className="flex h-dvh bg-bg text-ink antialiased overflow-hidden font-sans">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-64 flex-col border-r border-hairline bg-card shrink-0">
           {navContent}
@@ -169,20 +170,20 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
               className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-[f-fadein_.2s_ease-out]"
               onClick={() => setMobileOpen(false)}
             />
-            <div className="fixed inset-y-0 left-0 w-64 bg-card border-r border-hairline shadow-2xl animate-[f-modalin_.25s_var(--ease)]">
+            <div className="fixed inset-y-0 left-0 w-64 max-w-[85vw] bg-card border-r border-hairline shadow-2xl animate-[f-modalin_.25s_var(--ease)]">
               {navContent}
             </div>
           </div>
         )}
 
         {/* Main Content Area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <header className="flex h-16 items-center justify-between border-b border-hairline bg-card px-4 lg:px-8 shrink-0">
-            <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="flex h-16 items-center justify-between gap-2 border-b border-hairline bg-card px-4 lg:px-8 shrink-0">
+            <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden p-2 text-mute hover:text-ink rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="lg:hidden shrink-0 p-2 text-mute hover:text-ink rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label="Open sidebar"
               >
                 <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -193,14 +194,14 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
               </button>
 
               {/* Breadcrumbs */}
-              <div className="flex items-center gap-2 text-cell font-medium">
+              <div className="flex min-w-0 items-center gap-2 text-cell font-medium">
                 <span className="text-mute">Admin</span>
                 <span className="text-faint">/</span>
-                <span className="text-ink font-semibold">{pageTitle}</span>
+                <span className="truncate text-ink font-semibold">{pageTitle}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-3">
               {/* External live site shortcut */}
               <Link
                 href="/"

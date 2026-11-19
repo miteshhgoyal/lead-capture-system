@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition, useCallback } from "react";
+import { useEffect, useState, useTransition, useCallback, type ReactNode } from "react";
 import {
   Button,
   Card,
@@ -317,6 +317,96 @@ export default function PartnersPage() {
     showToast("URL copied to clipboard!", "success");
   };
 
+  const getLiveUrl = (partner: PartnerItem) =>
+    `${typeof window !== "undefined" ? window.location.origin : ""}/${partner.slug}`;
+
+  /* Shared pieces used by both the mobile card list and the desktop table */
+  const renderAvatar = (partner: PartnerItem): ReactNode =>
+    partner.logoUrl ? (
+      <img
+        src={partner.logoUrl}
+        alt={partner.name}
+        className="size-9 shrink-0 rounded-xl border border-hairline object-contain p-0.5 bg-bg"
+      />
+    ) : (
+      <div
+        style={{ backgroundColor: partner.theme?.primaryColor || "#3b36e0" }}
+        className="flex size-9 shrink-0 items-center justify-center rounded-xl text-white font-bold text-xs shadow-sm"
+      >
+        {partner.name.slice(0, 2).toUpperCase()}
+      </div>
+    );
+
+  const renderToggle = (partner: PartnerItem): ReactNode => (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={partner.isActive}
+      aria-label={`${partner.name} active`}
+      onClick={() => handleToggleActive(partner)}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+        partner.isActive ? "bg-up" : "bg-mute/40"
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block size-4 rounded-full bg-white shadow-md transform transition duration-200 ease-in-out ${
+          partner.isActive ? "translate-x-4" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+
+  const renderActions = (partner: PartnerItem): ReactNode => (
+    <div className="flex items-center justify-end gap-1 sm:gap-2">
+      <a
+        href={`/${partner.slug}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-lg p-2 text-mute hover:text-ink hover:bg-bg-alt"
+        title="Open live partner page"
+        aria-label="Open live partner page"
+      >
+        <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </a>
+
+      <button
+        onClick={() => openEditModal(partner)}
+        className="rounded-lg p-2 text-mute hover:text-accent hover:bg-bg-alt"
+        title="Edit partner"
+        aria-label="Edit partner"
+      >
+        <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+        </svg>
+      </button>
+
+      <button
+        onClick={() => setRegenTarget(partner)}
+        className="rounded-lg p-2 text-mute hover:text-accent hover:bg-bg-alt"
+        title="Regenerate page layout"
+        aria-label={`Regenerate page for ${partner.name}`}
+      >
+        <Shuffle className="size-4" aria-hidden />
+      </button>
+
+      <button
+        onClick={() => setDeleteTarget(partner)}
+        className="rounded-lg p-2 text-mute hover:text-down hover:bg-down/10"
+        title="Delete partner"
+        aria-label="Delete partner"
+      >
+        <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      </button>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -338,18 +428,18 @@ export default function PartnersPage() {
 
       {/* Success Live URL Banner (shown after creation/update) */}
       {savedSuccessUrl && (
-        <div className="relative flex flex-col items-start justify-between gap-4 rounded-2xl border border-up/30 bg-up/10 p-5 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-up text-white">
+        <div className="relative flex flex-col items-start justify-between gap-4 rounded-2xl border border-up/30 bg-up/10 p-4 sm:flex-row sm:items-center sm:p-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-up text-white">
               <Check className="size-5" aria-hidden />
             </span>
-            <div>
+            <div className="min-w-0">
               <h4 className="text-sm font-bold text-ink">Partner Page is LIVE Instantly!</h4>
-              <p className="mt-0.5 text-xs text-mute font-mono">{savedSuccessUrl}</p>
+              <p className="mt-0.5 break-all text-xs text-mute font-mono">{savedSuccessUrl}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => copyToClipboard(savedSuccessUrl)}
               className="inline-flex items-center gap-1.5 rounded-xl border border-hairline bg-card px-3.5 py-2 text-xs font-semibold text-ink shadow-sm transition hover:bg-bg-alt"
@@ -375,8 +465,69 @@ export default function PartnersPage() {
         </div>
       )}
 
-      {/* Partners Table */}
-      <Card className="overflow-hidden">
+      {/* ───────── Mobile: card list ───────── */}
+      <div className="space-y-3 md:hidden">
+        {loading ? (
+          <div className="rounded-2xl border border-hairline bg-card px-6 py-12 text-center text-sm text-mute">
+            Loading partners...
+          </div>
+        ) : partners.length === 0 ? (
+          <div className="rounded-2xl border border-hairline bg-card px-6 py-12 text-center text-sm text-mute">
+            No partners created yet. Tap "+ Add New Partner" to launch your first partner!
+          </div>
+        ) : (
+          partners.map((partner) => {
+            const liveUrl = getLiveUrl(partner);
+            return (
+              <div key={partner._id} className="rounded-2xl border border-hairline bg-card p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    {renderAvatar(partner)}
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-ink">{partner.name}</div>
+                      <div className="truncate font-mono text-xs text-mute">/{partner.slug}</div>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-[11px] font-semibold text-mute">
+                      {partner.isActive ? "Active" : "Inactive"}
+                    </span>
+                    {renderToggle(partner)}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mute">
+                  <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 font-bold text-accent">
+                    {partner.leadsCount.toLocaleString()} leads
+                  </span>
+                  <a
+                    href={partner.telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    Telegram ↗
+                  </a>
+                  <span>{new Date(partner.createdAt).toLocaleDateString()}</span>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline pt-3">
+                  <button
+                    onClick={() => copyToClipboard(liveUrl)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-xs font-semibold text-ink hover:bg-bg-alt"
+                  >
+                    <Copy className="size-3.5" aria-hidden /> Copy URL
+                  </button>
+                  {renderActions(partner)}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* ───────── Desktop: table ───────── */}
+      <Card className="hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-hairline bg-bg-alt/50 text-xs font-semibold uppercase tracking-wider text-mute">
@@ -405,27 +556,14 @@ export default function PartnersPage() {
                 </tr>
               ) : (
                 partners.map((partner) => {
-                  const liveUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/${partner.slug}`;
+                  const liveUrl = getLiveUrl(partner);
 
                   return (
                     <tr key={partner._id} className="transition hover:bg-bg-alt/30">
                       {/* Name & Logo */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          {partner.logoUrl ? (
-                            <img
-                              src={partner.logoUrl}
-                              alt={partner.name}
-                              className="size-9 rounded-xl border border-hairline object-contain p-0.5 bg-bg"
-                            />
-                          ) : (
-                            <div
-                              style={{ backgroundColor: partner.theme?.primaryColor || "#3b36e0" }}
-                              className="flex size-9 items-center justify-center rounded-xl text-white font-bold text-xs shadow-sm"
-                            >
-                              {partner.name.slice(0, 2).toUpperCase()}
-                            </div>
-                          )}
+                          {renderAvatar(partner)}
                           <div>
                             <div className="font-semibold text-ink">{partner.name}</div>
                             <div className="text-xs text-mute font-mono">/{partner.slug}</div>
@@ -475,21 +613,7 @@ export default function PartnersPage() {
                       </td>
 
                       {/* Status Toggle */}
-                      <td className="px-6 py-4">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleActive(partner)}
-                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                            partner.isActive ? "bg-up" : "bg-mute/40"
-                          }`}
-                        >
-                          <span
-                            className={`pointer-events-none inline-block size-4 rounded-full bg-white shadow-md transform transition duration-200 ease-in-out ${
-                              partner.isActive ? "translate-x-4" : "translate-x-0"
-                            }`}
-                          />
-                        </button>
-                      </td>
+                      <td className="px-6 py-4">{renderToggle(partner)}</td>
 
                       {/* Created */}
                       <td className="px-6 py-4 text-xs text-mute">
@@ -497,53 +621,7 @@ export default function PartnersPage() {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <a
-                            href={`/${partner.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-lg p-1.5 text-mute hover:text-ink hover:bg-bg-alt"
-                            title="Open live partner page"
-                          >
-                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                              <polyline points="15 3 21 3 21 9" />
-                              <line x1="10" y1="14" x2="21" y2="3" />
-                            </svg>
-                          </a>
-
-                          <button
-                            onClick={() => openEditModal(partner)}
-                            className="rounded-lg p-1.5 text-mute hover:text-accent hover:bg-bg-alt"
-                            title="Edit partner"
-                          >
-                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                            </svg>
-                          </button>
-
-                          <button
-                            onClick={() => setRegenTarget(partner)}
-                            className="rounded-lg p-1.5 text-mute hover:text-accent hover:bg-bg-alt"
-                            title="Regenerate page layout"
-                            aria-label={`Regenerate page for ${partner.name}`}
-                          >
-                            <Shuffle className="size-4" aria-hidden />
-                          </button>
-
-                          <button
-                            onClick={() => setDeleteTarget(partner)}
-                            className="rounded-lg p-1.5 text-mute hover:text-down hover:bg-down/10"
-                            title="Delete partner"
-                          >
-                            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <polyline points="3 6 5 6 21 6" />
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
+                      <td className="px-6 py-4 text-right">{renderActions(partner)}</td>
                     </tr>
                   );
                 })
@@ -575,20 +653,27 @@ export default function PartnersPage() {
             <label className="mb-1 block text-xs font-semibold text-ink">
               Custom Slug <span className="text-down">*</span>
             </label>
-            <div className="relative">
-              <Input
-                required
-                placeholder="aman-singh"
-                value={slug}
-                onChange={(e) => setSlug(slugify(e.target.value))}
-              />
-              <div className="absolute right-3 top-2.5 text-xs font-semibold">
-                {slugStatus === "checking" && <span className="text-mute animate-pulse">Checking...</span>}
-                {slugStatus === "available" && <span className="inline-flex items-center gap-1 font-bold text-up"><Check className="size-3.5" aria-hidden /> Available</span>}
-                {slugStatus === "unavailable" && <span className="inline-flex items-center gap-1 text-down"><X className="size-3.5" aria-hidden /> {slugReason}</span>}
-              </div>
+            <Input
+              required
+              placeholder="aman-singh"
+              value={slug}
+              onChange={(e) => setSlug(slugify(e.target.value))}
+            />
+            {/* Status sits below the input so long messages never overlap the typed text on small screens */}
+            <div className="mt-1.5 min-h-4 text-xs font-semibold">
+              {slugStatus === "checking" && <span className="text-mute animate-pulse">Checking...</span>}
+              {slugStatus === "available" && (
+                <span className="inline-flex items-center gap-1 font-bold text-up">
+                  <Check className="size-3.5" aria-hidden /> Available
+                </span>
+              )}
+              {slugStatus === "unavailable" && (
+                <span className="inline-flex items-start gap-1 text-down">
+                  <X className="mt-0.5 size-3.5 shrink-0" aria-hidden /> <span>{slugReason}</span>
+                </span>
+              )}
             </div>
-            <p className="mt-1 text-[11px] text-mute font-mono">
+            <p className="mt-1 break-all text-[11px] text-mute font-mono">
               Live URL will be: domain.com/{slug || "slug"}
             </p>
           </div>
@@ -636,8 +721,8 @@ export default function PartnersPage() {
 
           {/* Testimonials (shown on the page only when at least one is added) */}
           <div className="rounded-2xl border border-hairline bg-card/60 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <h4 className="text-sm font-bold text-ink">Student Testimonials</h4>
                 <p className="text-[11px] text-mute">
                   Only add real feedback you have permission to publish. The section stays hidden while this list is empty.
@@ -646,6 +731,7 @@ export default function PartnersPage() {
               <Button
                 type="button"
                 variant="secondary"
+                className="shrink-0"
                 disabled={testimonials.length >= MAX_TESTIMONIALS}
                 onClick={() => setTestimonials((prev) => [...prev, { name: "", role: "", quote: "" }])}
               >
@@ -711,7 +797,7 @@ export default function PartnersPage() {
                 </div>
               )}
 
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp,image/svg+xml"
@@ -738,14 +824,14 @@ export default function PartnersPage() {
                   type="color"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="size-8 rounded-lg border-0 cursor-pointer p-0"
+                  className="size-8 shrink-0 rounded-lg border-0 cursor-pointer p-0"
                   aria-label="Brand color"
                 />
                 <input
                   type="text"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
+                  className="min-w-0 w-full text-xs font-mono rounded-lg border border-hairline bg-bg p-1.5"
                 />
               </div>
               <p className="mt-1.5 text-[11px] text-mute">
@@ -756,7 +842,7 @@ export default function PartnersPage() {
             {/* REAL-TIME LIVE PREVIEW (Light + Dark Modes) */}
             <div className="pt-2">
               <span className="text-[11px] font-semibold text-mute block mb-2">Live Theme Preview:</span>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
                 {/* Light Mode Preview */}
                 <div className="rounded-xl border border-hairline bg-white p-3 text-black shadow-sm">
                   <span className="text-[10px] font-bold text-gray-500 block mb-2">LIGHT MODE</span>
@@ -789,7 +875,7 @@ export default function PartnersPage() {
           </div>
 
           {/* Active Status */}
-          <div className="flex items-center justify-between rounded-xl border border-hairline bg-card p-4">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-hairline bg-card p-4">
             <div>
               <span className="text-sm font-semibold text-ink block">Partner Page Active</span>
               <span className="text-xs text-mute">When inactive, the page returns 404</span>

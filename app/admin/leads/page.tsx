@@ -44,6 +44,16 @@ interface LeadItem {
   updatedAt: string;
 }
 
+function statusSelectClass(status: LeadStatus) {
+  return status === "new"
+    ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
+    : status === "contacted"
+    ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
+    : status === "joined"
+    ? "border-up/30 bg-up/10 text-up"
+    : "border-down/30 bg-down/10 text-down";
+}
+
 export default function LeadsPage() {
   const { showToast } = useToast();
 
@@ -75,6 +85,12 @@ export default function LeadsPage() {
 
   // Delete Target
   const [deleteTarget, setDeleteTarget] = useState<LeadItem | null>(null);
+
+  // Pre-select the partner when arriving from the Performance page (?partnerSlug=...)
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("partnerSlug");
+    if (slug) setPartnerFilter(slug);
+  }, []);
 
   // Load partners list for filter dropdown
   useEffect(() => {
@@ -265,6 +281,37 @@ export default function LeadsPage() {
     setEditNotes(lead.notes || "");
   };
 
+  const allSelected = leads.length > 0 && selectedIds.size === leads.length;
+
+  const pagination = (
+    <div className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+      <div className="text-xs text-mute">
+        Showing {totalLeads === 0 ? 0 : (page - 1) * limit + 1} to {Math.min(page * limit, totalLeads)} of{" "}
+        {totalLeads.toLocaleString()} leads
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          className="rounded-lg border border-hairline bg-card px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-bg-alt disabled:opacity-40"
+        >
+          Previous
+        </button>
+        <span className="text-xs text-mute">
+          Page {page} of {Math.max(1, totalPages)}
+        </span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage((p) => p + 1)}
+          className="rounded-lg border border-hairline bg-card px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-bg-alt disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Top Header & Export */}
@@ -371,7 +418,7 @@ export default function LeadsPage() {
 
         {/* Date Filters & Clear */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-mute">Date:</span>
             <input
               type="date"
@@ -380,7 +427,7 @@ export default function LeadsPage() {
                 setStartDate(e.target.value);
                 setPage(1);
               }}
-              className="rounded-lg border border-hairline bg-bg px-2 py-1 text-xs text-ink"
+              className="min-w-0 rounded-lg border border-hairline bg-bg px-2 py-1 text-xs text-ink"
             />
             <span className="text-xs text-mute">to</span>
             <input
@@ -390,7 +437,7 @@ export default function LeadsPage() {
                 setEndDate(e.target.value);
                 setPage(1);
               }}
-              className="rounded-lg border border-hairline bg-bg px-2 py-1 text-xs text-ink"
+              className="min-w-0 rounded-lg border border-hairline bg-bg px-2 py-1 text-xs text-ink"
             />
           </div>
 
@@ -415,7 +462,7 @@ export default function LeadsPage() {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-accent/30 bg-accent/10 px-5 py-3">
+        <div className="flex flex-col gap-3 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="flex items-center gap-2 text-xs font-semibold text-ink">
             <span className="flex size-5 items-center justify-center rounded-full bg-accent text-accent-ink text-[10px]">
               {selectedIds.size}
@@ -423,11 +470,11 @@ export default function LeadsPage() {
             <span>Selected</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as LeadStatus)}
-              className="rounded-lg border border-hairline bg-bg px-2.5 py-1 text-xs text-ink"
+              className="rounded-lg border border-hairline bg-bg px-2.5 py-1.5 text-xs text-ink"
             >
               <option value="new">Mark New</option>
               <option value="contacted">Mark Contacted</option>
@@ -436,13 +483,13 @@ export default function LeadsPage() {
             </select>
             <button
               onClick={handleBulkStatusUpdate}
-              className="rounded-lg bg-accent px-3 py-1 text-xs font-semibold text-accent-ink shadow-sm"
+              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink shadow-sm"
             >
               Apply Status
             </button>
             <button
               onClick={handleBulkDelete}
-              className="rounded-lg bg-down px-3 py-1 text-xs font-semibold text-white shadow-sm"
+              className="rounded-lg bg-down px-3 py-1.5 text-xs font-semibold text-white shadow-sm"
             >
               Delete Selected
             </button>
@@ -450,8 +497,138 @@ export default function LeadsPage() {
         </div>
       )}
 
-      {/* Table */}
-      <Card className="overflow-hidden">
+      {/* ───────── Mobile: card list ───────── */}
+      <div className="space-y-3 md:hidden">
+        {loading ? (
+          <div className="rounded-2xl border border-hairline bg-card px-6 py-12 text-center text-sm text-mute">
+            Loading leads...
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="rounded-2xl border border-hairline bg-card px-6 py-12 text-center text-sm text-mute">
+            No leads found matching your criteria.
+          </div>
+        ) : (
+          <>
+            <label className="flex items-center gap-2 px-1 text-xs font-semibold text-mute">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                className="size-4 rounded border-hairline"
+              />
+              Select all on this page
+            </label>
+
+            {leads.map((lead) => {
+              const whatsappClean = lead.phone.replace(/[^\d]/g, "");
+              const isSelected = selectedIds.has(lead._id);
+
+              return (
+                <div
+                  key={lead._id}
+                  className={`rounded-2xl border bg-card p-4 ${
+                    isSelected ? "border-accent/40 bg-accent/5" : "border-hairline"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelectOne(lead._id)}
+                      className="mt-1 size-4 shrink-0 rounded border-hairline"
+                      aria-label={`Select ${lead.name}`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="break-words font-semibold text-ink">{lead.name}</span>
+                        {lead.isDuplicate && (
+                          <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[9px] font-bold text-amber-500">
+                            DUP
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-0.5 text-[11px] text-mute">
+                        {new Date(lead.createdAt).toLocaleDateString()}{" "}
+                        {new Date(lead.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center">
+                      <button
+                        onClick={() => openDetailDrawer(lead)}
+                        className="rounded-lg p-2 text-mute hover:bg-bg-alt hover:text-ink"
+                        aria-label="View lead details"
+                      >
+                        <Search className="size-4" aria-hidden />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(lead)}
+                        className="rounded-lg p-2 text-mute hover:bg-down/10 hover:text-down"
+                        aria-label="Delete lead"
+                      >
+                        <Trash2 className="size-4" aria-hidden />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-xs">
+                    <div className="flex items-center gap-2 font-mono text-ink">
+                      <span className="break-all">{lead.phone}</span>
+                      <a
+                        href={`https://wa.me/${whatsappClean}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 text-up"
+                        aria-label="Chat on WhatsApp"
+                      >
+                        <MessageCircle className="size-4" aria-hidden />
+                      </a>
+                    </div>
+                    <div className="break-all text-mute">{lead.email}</div>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-mute">
+                      <span>
+                        {lead.age} yrs · {lead.profession}
+                      </span>
+                      <span className="font-medium text-ink">{lead.capital}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[11px] font-semibold ${
+                          lead.source === "partner-page" ? "bg-accent/10 text-accent" : "bg-hairline text-mute"
+                        }`}
+                      >
+                        {lead.partnerName}
+                      </span>
+                      {lead.utm_source && (
+                        <span className="rounded border border-hairline bg-bg-alt px-1.5 py-0.5 font-mono text-[11px] text-mute">
+                          {lead.utm_source}
+                        </span>
+                      )}
+                    </div>
+                    <select
+                      value={lead.status}
+                      onChange={(e) => handleStatusChange(lead._id, e.target.value as LeadStatus)}
+                      className={`rounded-lg border px-2 py-1.5 text-xs font-semibold focus:outline-none ${statusSelectClass(lead.status)}`}
+                    >
+                      <option value="new">New</option>
+                      <option value="contacted">Contacted</option>
+                      <option value="joined">Joined</option>
+                      <option value="not-interested">Not Interested</option>
+                    </select>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
+
+        <div className="rounded-2xl border border-hairline bg-card">{pagination}</div>
+      </div>
+
+      {/* ───────── Desktop: table ───────── */}
+      <Card className="hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-hairline bg-bg-alt/50 text-[11px] font-semibold uppercase tracking-wider text-mute">
@@ -459,7 +636,7 @@ export default function LeadsPage() {
                 <th className="px-4 py-3.5 w-10">
                   <input
                     type="checkbox"
-                    checked={leads.length > 0 && selectedIds.size === leads.length}
+                    checked={allSelected}
                     onChange={toggleSelectAll}
                     className="rounded border-hairline size-4"
                   />
@@ -584,15 +761,7 @@ export default function LeadsPage() {
                           onChange={(e) =>
                             handleStatusChange(lead._id, e.target.value as LeadStatus)
                           }
-                          className={`rounded-lg border px-2 py-1 text-xs font-semibold focus:outline-none ${
-                            lead.status === "new"
-                              ? "border-blue-500/30 bg-blue-500/10 text-blue-500"
-                              : lead.status === "contacted"
-                              ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
-                              : lead.status === "joined"
-                              ? "border-up/30 bg-up/10 text-up"
-                              : "border-down/30 bg-down/10 text-down"
-                          }`}
+                          className={`rounded-lg border px-2 py-1 text-xs font-semibold focus:outline-none ${statusSelectClass(lead.status)}`}
                         >
                           <option value="new">New</option>
                           <option value="contacted">Contacted</option>
@@ -637,33 +806,7 @@ export default function LeadsPage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-hairline p-4 sm:flex-row">
-          <div className="text-xs text-mute">
-            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalLeads)} of{" "}
-            {totalLeads.toLocaleString()} leads
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded-lg border border-hairline bg-card px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-bg-alt disabled:opacity-40"
-            >
-              Previous
-            </button>
-            <span className="text-xs text-mute">
-              Page {page} of {Math.max(1, totalPages)}
-            </span>
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="rounded-lg border border-hairline bg-card px-3 py-1.5 text-xs font-semibold text-ink transition hover:bg-bg-alt disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <div className="border-t border-hairline">{pagination}</div>
       </Card>
 
       {/* Lead Detail Drawer */}
@@ -675,12 +818,12 @@ export default function LeadsPage() {
         {activeLead && (
           <div className="space-y-6">
             {/* Quick Profile */}
-            <div className="flex items-center justify-between rounded-2xl border border-hairline bg-card p-4">
-              <div>
-                <h3 className="text-lg font-bold text-ink">{activeLead.name}</h3>
-                <p className="text-xs text-mute">{activeLead.email}</p>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-hairline bg-card p-4">
+              <div className="min-w-0">
+                <h3 className="break-words text-lg font-bold text-ink">{activeLead.name}</h3>
+                <p className="break-all text-xs text-mute">{activeLead.email}</p>
               </div>
-              <div className="text-right">
+              <div className="shrink-0 text-right">
                 <span
                   className={`inline-block rounded-full px-3 py-1 text-xs font-bold uppercase ${
                     activeLead.status === "new"
@@ -698,11 +841,11 @@ export default function LeadsPage() {
             </div>
 
             {/* Information Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-xl border border-hairline bg-bg-alt/40 p-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              <div className="rounded-xl border border-hairline bg-bg-alt/40 p-3 sm:col-span-2">
                 <span className="text-[11px] font-semibold text-mute block">Phone (WhatsApp)</span>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="font-mono text-xs font-bold text-ink">{activeLead.phone}</span>
+                <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-bold text-ink break-all">{activeLead.phone}</span>
                   <a
                     href={`https://wa.me/${activeLead.phone.replace(/[^\d]/g, "")}`}
                     target="_blank"
@@ -726,7 +869,7 @@ export default function LeadsPage() {
                 </span>
               </div>
 
-              <div className="rounded-xl border border-hairline bg-bg-alt/40 p-3">
+              <div className="rounded-xl border border-hairline bg-bg-alt/40 p-3 sm:col-span-2">
                 <span className="text-[11px] font-semibold text-mute block">Country</span>
                 <span className="text-xs font-bold text-ink mt-1 block">{activeLead.country}</span>
               </div>
@@ -738,13 +881,13 @@ export default function LeadsPage() {
                 Attribution & Partner Source
               </h4>
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
+                <div className="min-w-0">
                   <span className="text-mute block">Attributed Partner</span>
-                  <span className="font-semibold text-accent">{activeLead.partnerName}</span>
+                  <span className="font-semibold text-accent break-words">{activeLead.partnerName}</span>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-mute block">Partner Slug</span>
-                  <span className="font-mono text-ink font-semibold">/{activeLead.partnerSlug}</span>
+                  <span className="font-mono text-ink font-semibold break-all">/{activeLead.partnerSlug}</span>
                 </div>
                 <div>
                   <span className="text-mute block">Source Channel</span>
@@ -755,25 +898,25 @@ export default function LeadsPage() {
                   <span className="capitalize text-ink">{activeLead.device || "desktop"}</span>
                 </div>
                 {activeLead.utm_source && (
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-mute block">UTM Source</span>
-                    <span className="font-mono text-ink">{activeLead.utm_source}</span>
+                    <span className="font-mono text-ink break-all">{activeLead.utm_source}</span>
                   </div>
                 )}
                 {activeLead.utm_medium && (
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-mute block">UTM Medium</span>
-                    <span className="font-mono text-ink">{activeLead.utm_medium}</span>
+                    <span className="font-mono text-ink break-all">{activeLead.utm_medium}</span>
                   </div>
                 )}
                 {activeLead.utm_campaign && (
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-mute block">UTM Campaign</span>
-                    <span className="font-mono text-ink">{activeLead.utm_campaign}</span>
+                    <span className="font-mono text-ink break-all">{activeLead.utm_campaign}</span>
                   </div>
                 )}
                 {activeLead.referrer && (
-                  <div className="col-span-2">
+                  <div className="col-span-2 min-w-0">
                     <span className="text-mute block">Referrer</span>
                     <span className="font-mono text-xs text-mute truncate block">{activeLead.referrer}</span>
                   </div>

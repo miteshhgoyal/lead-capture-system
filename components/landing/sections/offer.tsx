@@ -24,8 +24,8 @@ function Checklist({ items, columns = false }: { items: string[]; columns?: bool
 
 function PriceBlock({ content }: { content: OfferProps["content"] }) {
   return (
-    <div>
-      <div className="text-5xl font-extrabold tracking-tight text-ink">{content.priceLabel}</div>
+    <div className="min-w-0">
+      <div className="break-words text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">{content.priceLabel}</div>
       <div className="mt-1 text-xs font-medium text-mute">{content.priceNote}</div>
     </div>
   );
@@ -37,7 +37,7 @@ export function Offer1({ content }: OfferProps) {
     <Section id="offer" className="py-16 lg:py-24">
       <Container size="md">
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
-        <Reveal className="mx-auto mt-10 max-w-lg rounded-3xl border border-accent/25 bg-gradient-to-br from-accent/10 via-card to-card p-8 text-center shadow-xl">
+        <Reveal className="mx-auto mt-10 max-w-lg rounded-3xl border border-accent/25 bg-gradient-to-br from-accent/10 via-card to-card p-6 text-center shadow-xl sm:p-8">
           <PriceBlock content={content} />
           <div className="my-6 border-t border-hairline" />
           <div className="text-left">
@@ -60,14 +60,15 @@ export function Offer2({ content }: OfferProps) {
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionHeader align="left" eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
-            <div className="mt-6 flex items-center gap-6">
+            {/* Wraps on narrow screens so the price and button never overflow */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
               <PriceBlock content={content} />
               <CtaButton className="px-6 py-3.5 text-sm">
                 {content.ctaLabel} <ArrowRight className="size-4" aria-hidden />
               </CtaButton>
             </div>
           </div>
-          <Reveal className="rounded-3xl border border-hairline bg-card p-7 shadow-sm sm:p-9">
+          <Reveal className="rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-9">
             <Checklist items={content.items} />
           </Reveal>
         </div>
@@ -83,10 +84,10 @@ export function Offer3({ content }: OfferProps) {
       <Container size="lg">
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
         <Reveal className="mt-10 flex flex-col overflow-hidden rounded-3xl border border-hairline bg-card shadow-lg md:flex-row">
-          <div className="flex-1 p-7 sm:p-9">
+          <div className="flex-1 p-6 sm:p-9">
             <Checklist items={content.items} columns />
           </div>
-          <div className="relative flex flex-col items-center justify-center gap-5 border-t-2 border-dashed border-hairline-strong bg-gradient-to-br from-accent/10 to-accent-2/10 p-7 text-center md:w-72 md:border-l-2 md:border-t-0">
+          <div className="relative flex flex-col items-center justify-center gap-5 border-t-2 border-dashed border-hairline-strong bg-gradient-to-br from-accent/10 to-accent-2/10 p-6 text-center sm:p-7 md:w-72 md:border-l-2 md:border-t-0">
             <PriceBlock content={content} />
             <CtaButton className="w-full px-5 py-3 text-sm">
               {content.ctaLabel} <ArrowRight className="size-4" aria-hidden />

@@ -11,17 +11,17 @@ type FeaturesProps = SectionProps<"features">;
 
 function DisciplinePanel() {
   return (
-    <div className="rounded-2xl border border-hairline bg-card p-5">
-      <div className="flex items-center justify-between text-xs font-semibold text-mute">
+    <div className="rounded-2xl border border-hairline bg-card p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-semibold text-mute">
         <span>Trader Discipline Score</span>
         <span className="font-bold text-up">94% Target Compliance</span>
       </div>
       <div className="mt-3 space-y-2">
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 text-xs">
           <span className="text-mute">Zero Revenge Trades</span>
           <span className="font-semibold text-ink">100% Enforced</span>
         </div>
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 text-xs">
           <span className="text-mute">Max Daily Loss Cutoff</span>
           <span className="font-semibold text-ink">2% Total Capital</span>
         </div>
@@ -60,7 +60,7 @@ export function Features1({ content }: FeaturesProps) {
             <Reveal
               key={item.title}
               index={i % 2}
-              className="rt-lift flex flex-col justify-between rounded-3xl border border-hairline bg-card p-6 shadow-sm sm:p-8"
+              className="rt-lift flex min-w-0 flex-col justify-between rounded-3xl border border-hairline bg-card p-5 shadow-sm sm:p-8"
             >
               <div>
                 <IconTile item={item} index={i} />
@@ -113,11 +113,11 @@ export function Features3({ content }: FeaturesProps) {
           </div>
           <ol className="divide-y divide-hairline lg:col-span-7">
             {content.items.map((item, i) => (
-              <Reveal key={item.title} as="li" index={i} className="flex gap-5 py-6 first:pt-0">
+              <Reveal key={item.title} as="li" index={i} className="flex gap-4 py-6 first:pt-0 sm:gap-5">
                 <span className="w-8 shrink-0 text-2xl font-bold tabular-nums text-accent/40">{String(i + 1).padStart(2, "0")}</span>
-                <div>
+                <div className="min-w-0">
                   <h3 className="rt-h flex items-center gap-2 text-lg font-bold text-ink">
-                    <Icon name={item.icon} className="size-5 text-accent" />
+                    <Icon name={item.icon} className="size-5 shrink-0 text-accent" />
                     {item.title}
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-mute">{item.body}</p>
@@ -145,7 +145,7 @@ export function Features4({ content }: FeaturesProps) {
                 <h3 className="rt-h mt-4 text-2xl font-bold tracking-tight text-ink">{item.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-mute sm:text-base">{item.body}</p>
               </div>
-              <div className="rounded-3xl border border-hairline bg-card p-5 shadow-sm">
+              <div className="min-w-0 rounded-3xl border border-hairline bg-card p-4 shadow-sm sm:p-5">
                 {item.visual ? (
                   <FeatureVisualBlock visual={item.visual} />
                 ) : (

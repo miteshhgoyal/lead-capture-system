@@ -16,7 +16,10 @@ export function Container({ children, className = "", size = "xl" }: { children:
   return <div className={`mx-auto ${max} px-4 sm:px-6 lg:px-8 ${className}`.trim()}>{children}</div>;
 }
 
-/** Below-the-fold section wrapper: skips rendering work until near the viewport, without shifting layout. */
+/**
+ * Below-the-fold section wrapper: skips rendering work until near the viewport, without shifting layout.
+ * scroll-mt keeps anchor jumps (#learn, #faq, ...) from landing underneath the sticky navbar.
+ */
 export function Section({
   id,
   className = "",
@@ -29,7 +32,7 @@ export function Section({
   deferred?: boolean;
 }) {
   return (
-    <section id={id} className={`${deferred ? "rt-defer " : ""}border-t border-hairline ${className}`.trim()}>
+    <section id={id} className={`${deferred ? "rt-defer " : ""}scroll-mt-20 border-t border-hairline ${className}`.trim()}>
       {children}
     </section>
   );
@@ -125,7 +128,7 @@ export function BrandLogo({ ctx, className = "h-8" }: { ctx: Pick<PageContext, "
 export function HeroForm({ ctx }: { ctx: PageContext }) {
   if (ctx.preview) {
     return (
-      <div id="lead-form" className="rounded-3xl border border-dashed border-hairline-strong bg-card p-8 text-center text-sm text-mute">
+      <div id="lead-form" className="scroll-mt-24 rounded-3xl border border-dashed border-hairline-strong bg-card p-8 text-center text-sm text-mute">
         Lead form (disabled in preview)
       </div>
     );

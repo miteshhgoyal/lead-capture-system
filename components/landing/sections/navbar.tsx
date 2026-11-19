@@ -42,16 +42,19 @@ export function Navbar1({ content, ctx }: NavProps) {
   );
 }
 
-/** Variant 2: centred logo with the links on a second row. */
+/**
+ * Variant 2: centred logo with the links on a second row.
+ * Mobile: logo left, controls right (no overlap). Desktop (md+): logo centred, controls pinned right.
+ */
 export function Navbar2({ content, ctx }: NavProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline/80 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative flex h-14 items-center justify-center md:h-16">
-          <div className="flex items-center">
+        <div className="relative flex h-14 items-center justify-between md:h-16 md:justify-center">
+          <div className="flex min-w-0 items-center">
             <BrandLogo ctx={ctx} />
           </div>
-          <div className="absolute right-0 flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 md:absolute md:right-0">
             <ThemeToggle />
             <CtaButton className="px-3 py-1.5 text-xs md:hidden">{content.ctaLabel}</CtaButton>
           </div>

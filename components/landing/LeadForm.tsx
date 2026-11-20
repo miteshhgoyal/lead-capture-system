@@ -36,7 +36,7 @@ export function LeadForm({
   const [phone, setPhone] = useState("");
   const [capital, setCapital] = useState("");
   const [email, setEmail] = useState("");
-  const [age, setAge] = useState<string>("24");
+  const [age, setAge] = useState<string>("");
   const [profession, setProfession] = useState("");
   const [honeypot, setHoneypot] = useState("");
 

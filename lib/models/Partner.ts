@@ -33,6 +33,10 @@ export interface IPartner {
   sectionOrder?: SectionKey[] | null;
   seed?: number | null;
   createdBy?: string;
+  /** Partner portal login id (lowercase). Absent for partners that have no portal access yet. */
+  loginId?: string;
+  /** scrypt hash (salt:key). Never selected by default: use `.select("+passwordHash")`. */
+  passwordHash?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -78,6 +82,8 @@ const partnerSchema = new Schema<IPartner>(
     sectionOrder: { type: Schema.Types.Mixed, default: null },
     seed: { type: Number, default: null },
     createdBy: { type: String, trim: true },
+    loginId: { type: String, lowercase: true, trim: true },
+    passwordHash: { type: String, select: false },
   },
   {
     timestamps: true,
@@ -86,6 +92,8 @@ const partnerSchema = new Schema<IPartner>(
 
 partnerSchema.index({ slug: 1 }, { unique: true });
 partnerSchema.index({ isActive: 1, createdAt: -1 });
+// Partial index (not sparse) so partners without a loginId never collide.
+partnerSchema.index({ loginId: 1 }, { unique: true, partialFilterExpression: { loginId: { $type: "string" } } });
 
 export const Partner: Model<IPartner> =
   (models.Partner as Model<IPartner> | undefined) ?? model<IPartner>("Partner", partnerSchema);

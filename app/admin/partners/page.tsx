@@ -30,6 +30,8 @@ interface PartnerItem {
   whatsappGroupLink?: string;
   zoomLink?: string;
   isActive: boolean;
+  loginId?: string;
+  createdBy?: string;
   tagline?: string;
   mentorBio?: string;
   logoUrl?: string;
@@ -65,6 +67,9 @@ export default function PartnersPage() {
   const [logoUrl, setLogoUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#3b36e0");
   const [isActive, setIsActive] = useState(true);
+  const [loginId, setLoginId] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [savingLogin, setSavingLogin] = useState(false);
 
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, startSaving] = useTransition();
@@ -157,6 +162,8 @@ export default function PartnersPage() {
     setLogoUrl(partner.logoUrl || "");
     setPrimaryColor(partner.theme?.primaryColor || "#3b36e0");
     setIsActive(partner.isActive);
+    setLoginId(partner.loginId || "");
+    setNewPassword("");
     setDrawerOpen(true);
   };
 
@@ -251,6 +258,31 @@ export default function PartnersPage() {
       showToast("Network error", "error");
     } finally {
       setRegenTarget(null);
+    }
+  };
+
+  const handleSaveLogin = async () => {
+    if (!editingPartner) return;
+    setSavingLogin(true);
+    try {
+      const res = await fetch(`/api/admin/partners/${editingPartner._id}/credentials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginId: loginId.trim(), password: newPassword || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        showToast(newPassword ? "Portal login and password saved" : "Portal login saved", "success");
+        setNewPassword("");
+        setEditingPartner({ ...editingPartner, loginId: data.loginId });
+        await fetchPartners();
+      } else {
+        showToast(data.error || "Failed to save login", "error");
+      }
+    } catch {
+      showToast("Network error while saving login", "error");
+    } finally {
+      setSavingLogin(false);
     }
   };
 
@@ -874,11 +906,33 @@ export default function PartnersPage() {
             </div>
           </div>
 
+          {/* Portal login (edit only) */}
+          {editingPartner && (
+            <div className="space-y-3 rounded-xl border border-hairline bg-card p-4">
+              <div>
+                <span className="text-sm font-semibold text-ink block">Partner Portal Login</span>
+                <span className="text-xs text-mute">
+                  {editingPartner.createdBy === "self-signup" ? "Self sign-up. " : ""}
+                  Set or reset the ID and password this partner uses at /partner/login. Resetting the password signs them out.
+                </span>
+              </div>
+              <Field label="Login ID">
+                <Input value={loginId} onChange={(e) => setLoginId(e.target.value)} autoComplete="off" placeholder="partner@email.com" />
+              </Field>
+              <Field label={editingPartner.loginId ? "New password (leave empty to keep)" : "Password"} hint="At least 8 characters">
+                <Input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="off" placeholder="••••••••" />
+              </Field>
+              <Button type="button" variant="secondary" disabled={savingLogin || loginId.trim().length < 3} onClick={handleSaveLogin}>
+                {savingLogin ? "Saving…" : "Save login"}
+              </Button>
+            </div>
+          )}
+
           {/* Active Status */}
           <div className="flex items-center justify-between gap-3 rounded-xl border border-hairline bg-card p-4">
             <div>
               <span className="text-sm font-semibold text-ink block">Partner Page Active</span>
-              <span className="text-xs text-mute">When inactive, the page returns 404</span>
+              <span className="text-xs text-mute">When inactive, the page returns 404, the partner leaves the public list and cannot sign in</span>
             </div>
             <button
               type="button"

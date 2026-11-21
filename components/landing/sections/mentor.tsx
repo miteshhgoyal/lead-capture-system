@@ -27,7 +27,7 @@ export function Mentor1({ content, ctx }: MentorProps) {
               <MentorLogo ctx={ctx} className="mb-4 size-24 rounded-2xl" />
               <h3 className="rt-h text-2xl font-bold text-ink">{ctx.mentorName}</h3>
               <p className="text-sm font-medium text-accent">{content.role}</p>
-              <div className="mt-4 flex items-center gap-2 rounded-full bg-up/10 px-3 py-1 text-xs font-semibold text-up">
+              <div className="mt-4 flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
                 <span>{content.badge}</span>
               </div>
             </div>
@@ -52,7 +52,7 @@ export function Mentor2({ content, ctx }: MentorProps) {
           <MentorLogo ctx={ctx} className="mx-auto size-28 rounded-full" />
           <h3 className="rt-h mt-5 text-2xl font-bold text-ink sm:text-3xl">{ctx.mentorName}</h3>
           <p className="mt-1 text-sm font-medium text-accent">{content.role}</p>
-          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-up/10 px-3 py-1 text-xs font-semibold text-up">
+          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
             <BadgeCheck className="size-3.5" aria-hidden /> {content.badge}
           </span>
           <h4 className="rt-h mx-auto mt-8 max-w-2xl text-xl font-semibold leading-snug text-ink sm:text-2xl">{content.title}</h4>

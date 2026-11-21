@@ -21,7 +21,7 @@ function TrustBadge({ text }: { text: string }) {
 }
 
 function HighlightCard({ item, index }: { item: HeroHighlight; index: number }) {
-  const tone = index % 2 === 0 ? "bg-accent/10 text-accent" : "bg-up/10 text-up";
+  const tone = index % 2 === 0 ? "bg-accent/10 text-accent" : "bg-accent-2/15 text-accent";
   return (
     <Reveal
       index={index}

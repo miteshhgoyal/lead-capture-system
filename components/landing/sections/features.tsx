@@ -38,7 +38,7 @@ function FeatureVisualBlock({ visual }: { visual: FeatureVisual }) {
 }
 
 function tone(i: number) {
-  return i === 3 ? "bg-down/10 text-down" : i % 2 === 1 ? "bg-up/10 text-up" : "bg-accent/10 text-accent";
+  return i % 2 === 1 ? "bg-accent-2/15 text-accent" : "bg-accent/10 text-accent";
 }
 
 function IconTile({ item, index, className = "size-12 rounded-2xl" }: { item: FeatureItem; index: number; className?: string }) {

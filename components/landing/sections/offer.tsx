@@ -12,7 +12,7 @@ function Checklist({ items, columns = false }: { items: string[]; columns?: bool
     <ul className={`grid gap-3 ${columns ? "sm:grid-cols-2" : ""}`}>
       {items.map((item, i) => (
         <Reveal key={item} as="li" index={i} className="flex items-start gap-3 text-sm text-ink">
-          <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-up/15 text-up">
+          <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
             <Check className="size-3.5" strokeWidth={3} aria-hidden />
           </span>
           {item}

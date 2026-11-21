@@ -24,7 +24,7 @@ const EMAIL_PROMPT = "Reply to this message with your email address and we'll se
 const DAY_MS = 24 * 3600 * 1000;
 const isDup = (e: unknown) => typeof e === "object" && e !== null && (e as { code?: number }).code === 11000;
 
-async function finishEvent(id: unknown, status: "processed" | "ignored" | "failed", note?: string, error?: string) {
+async function finishEvent(id: Types.ObjectId | string, status: "processed" | "ignored" | "failed", note?: string, error?: string) {
   await AutodmWebhookEvent.updateOne({ _id: id }, { $set: { status, note, error, processedAt: new Date() } });
 }
 

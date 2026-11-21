@@ -1,3 +1,4 @@
+import type { Types } from "mongoose";
 import { z } from "zod";
 import { dbConnect } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/http";
@@ -43,10 +44,19 @@ const AutomationInput = z.object({
 });
 
 /** Cross-field rules shared by create/update/activate. Returns an error message or null. */
-function contentProblem(a: z.infer<typeof AutomationInput> | IAutomation): string | null {
+type ContentInput = {
+  triggerType: IAutomation["triggerType"];
+  matchType: IAutomation["matchType"];
+  keywordList: string[];
+  dmMessage: string;
+  dmButtons?: { label: string; url: string }[];
+  commentReplyVariants: string[];
+};
+
+function contentProblem(a: ContentInput): string | null {
   const anyMatch = a.triggerType === "dm_default" || a.triggerType === "story_mention" || a.matchType === "any";
   if (!anyMatch && a.keywordList.length === 0) return "Add at least one keyword, or choose “any message”.";
-  const issues = validateAutomationContent({ dmMessage: a.dmMessage, buttons: "dmButtons" in a ? a.dmButtons : [], commentReplyVariants: a.commentReplyVariants, keywordList: a.keywordList });
+  const issues = validateAutomationContent({ dmMessage: a.dmMessage, buttons: a.dmButtons ?? [], commentReplyVariants: a.commentReplyVariants, keywordList: a.keywordList });
   return issues.errors[0] ?? null;
 }
 
@@ -90,7 +100,7 @@ function normalizeInput(i: z.infer<typeof AutomationInput>) {
 
 const mediaCache = new Map<string, { at: number; data: unknown }>();
 
-async function activeCount(accountId: unknown, exceptId?: unknown) {
+async function activeCount(accountId: Types.ObjectId | string, exceptId?: Types.ObjectId | string) {
   return AutodmAutomation.countDocuments({ accountId, status: "active", ...(exceptId ? { _id: { $ne: exceptId } } : {}) });
 }
 

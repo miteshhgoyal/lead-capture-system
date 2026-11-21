@@ -3,6 +3,7 @@ import { config } from "./config";
 import { sha256, randomToken } from "./crypto-utils";
 import { MetaError } from "./errors";
 import { getMetaClient } from "./meta";
+import type { Types } from "mongoose";
 import { AutodmAccount, AutodmAutomation, AutodmOAuthState, type IAccount } from "./models";
 import { decryptToken, encryptToken } from "./token-vault";
 import { FeatureGate, GateError } from "./settings-store";
@@ -27,7 +28,9 @@ export async function getAccountToken(accountId: unknown): Promise<{ account: IA
   }
 }
 
-export async function pauseAccountAutomations(accountId: unknown, reason: string): Promise<void> {
+type Id = Types.ObjectId | string;
+
+export async function pauseAccountAutomations(accountId: Id, reason: string): Promise<void> {
   await AutodmAutomation.updateMany({ accountId, status: "active" }, { $set: { status: "paused", pausedReason: reason } });
 }
 
@@ -125,7 +128,7 @@ export async function completeConnect(ownerId: string, p: { code?: string | null
 }
 
 /** Disconnect: unsubscribe webhook (best effort), wipe the token, pause automations. Data is kept for history. */
-export async function disconnectAccount(accountId: unknown, status: "revoked" | "disabled_by_admin" = "revoked"): Promise<void> {
+export async function disconnectAccount(accountId: Id, status: "revoked" | "disabled_by_admin" = "revoked"): Promise<void> {
   const found = await getAccountToken(accountId);
   if (found) {
     try {

@@ -111,7 +111,13 @@ const automationSchema = new Schema<IAutomation>({
   captureEmail: { type: Boolean, default: false },
   startsAt: { type: Date, default: null },
   endsAt: { type: Date, default: null },
-  stats: { type: { _id: false, triggered: { type: Number, default: 0 }, sent: { type: Number, default: 0 }, failed: { type: Number, default: 0 }, skipped: { type: Number, default: 0 }, replies: { type: Number, default: 0 } }, default: () => ({}) },
+  stats: {
+    triggered: { type: Number, default: 0 },
+    sent: { type: Number, default: 0 },
+    failed: { type: Number, default: 0 },
+    skipped: { type: Number, default: 0 },
+    replies: { type: Number, default: 0 },
+  },
   pausedReason: String,
 }, opts("autodm_automations"));
 automationSchema.index({ accountId: 1, status: 1 });
@@ -124,7 +130,7 @@ export interface IWebhookEvent {
   dedupeKey: string;
   accountExternalId: string;
   eventType: string;
-  normalized?: Record<string, unknown>;
+  normalized?: unknown;
   rawPayload?: unknown;
   signatureValid: boolean;
   status: "received" | "queued" | "processed" | "ignored" | "failed";

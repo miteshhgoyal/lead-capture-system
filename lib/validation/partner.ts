@@ -29,6 +29,8 @@ export const RESERVED_SLUGS = new Set([
   "about",
   "contact",
   "dev",
+  "autodm",
+  "data-deletion",
 ]);
 
 export function isReservedSlug(slug: string): boolean {

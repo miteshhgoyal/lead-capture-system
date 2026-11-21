@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { LayoutDashboard, LogOut, Palette, Users, KeyRound, ExternalLink, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, MessageCircle, Palette, Users, KeyRound, ExternalLink, Menu } from "lucide-react";
 import { ToastProvider } from "@/components/admin/Toast";
 import { SiteLogo } from "@/components/ui/SiteLogo";
 import { useThemeMode } from "@/components/theme-mode";
@@ -15,20 +15,26 @@ const NAV = [
   { href: "/partner/portal/account", label: "Account", Icon: KeyRound },
 ];
 
+/** Shown only when the admin has switched AutoDM on for this partner (the `autodm` prop). */
+const AUTODM_NAV = { href: "/autodm", label: "AutoDM", Icon: MessageCircle };
+
 interface Props {
   partner: { name: string; slug: string; logoUrl?: string; loginId?: string };
+  /** AutoDM is enabled and visible to this partner. */
+  autodm?: boolean;
   children: ReactNode;
 }
 
 /** Same layout as the admin console: sidebar, top bar with breadcrumb, scrolling content. */
-export function PartnerShell({ partner, children }: Props) {
+export function PartnerShell({ partner, autodm = false, children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { mode, toggle: toggleTheme } = useThemeMode();
 
   const isCurrent = (href: string) => (href === "/partner/portal" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`));
-  const current = NAV.find((n) => isCurrent(n.href));
+  const items = autodm ? [...NAV, AUTODM_NAV] : NAV;
+  const current = items.find((n) => isCurrent(n.href));
 
   const logout = async () => {
     try {
@@ -51,7 +57,7 @@ export function PartnerShell({ partner, children }: Props) {
         </div>
 
         <nav className="space-y-1 p-3">
-          {NAV.map(({ href, label, Icon }) => {
+          {items.map(({ href, label, Icon }) => {
             const active = isCurrent(href);
             return (
               <Link

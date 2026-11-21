@@ -40,14 +40,19 @@ const CHUNK = 800;
 const g = globalThis as unknown as { _revCache?: Map<string, { at: number; v: unknown }> };
 const cache = (g._revCache ??= new Map());
 
-interface Txn {
+/** One payment, after the union of `payments` and `webhookevents` (one entry per transaction id). */
+export interface Txn {
+  id: string;
+  source: "payments" | "webhook";
   key10: string;
   amount: number;
   paidAt: Date | null;
+  /** Payment plan/kind as the CRM labels it (payments only), e.g. "RECURRING_2500". */
+  kind: string;
 }
 
 /** Every phone spelling the Sales CRM might store for these leads: "+91..", "91..", "98..". */
-function phoneForms(phones: string[]): string[] {
+export function phoneForms(phones: string[]): string[] {
   const forms = new Set<string>();
   for (const phone of phones) {
     const k = phoneKey(phone);
@@ -68,6 +73,19 @@ function phoneForms(phones: string[]): string[] {
  * Read-only: `find` with projections only.
  */
 async function paidByPhone(keys: Set<string>, forms: string[]): Promise<Record<string, PaidInfo>> {
+  const byPhone: Record<string, PaidInfo> = {};
+  for (const t of await fetchTxns(keys, forms)) {
+    const cur = (byPhone[t.key10] ??= { amount: 0, txns: 0, lastPaidAt: null });
+    cur.amount += t.amount;
+    cur.txns += 1;
+    const iso = t.paidAt ? new Date(t.paidAt).toISOString() : null;
+    if (iso && (!cur.lastPaidAt || iso > cur.lastPaidAt)) cur.lastPaidAt = iso;
+  }
+  return byPhone;
+}
+
+/** Every successful transaction for these phone keys, unioned and de-duplicated by transaction id. */
+export async function fetchTxns(keys: Set<string>, forms: string[]): Promise<Txn[]> {
   const db = await getSalesDb();
   const txns = new Map<string, Txn>();
   const keyOf = (...phones: unknown[]) => phones.map(phoneKey).find((k) => k && keys.has(k)) ?? "";
@@ -81,7 +99,7 @@ async function paidByPhone(keys: Set<string>, forms: string[]): Promise<Record<s
         .collection("payments")
         .find(
           { status: "SUCCESS", $or: [{ leadPhone: { $in: chunk } }, { memberPhone: { $in: chunk } }] },
-          { projection: { transactionId: 1, amount: 1, paidAt: 1, leadPhone: 1, memberPhone: 1 } }
+          { projection: { transactionId: 1, amount: 1, paidAt: 1, leadPhone: 1, memberPhone: 1, kind: 1 } }
         )
         .toArray(),
       db
@@ -112,7 +130,7 @@ async function paidByPhone(keys: Set<string>, forms: string[]): Promise<Record<s
     const key10 = keyOf(d.leadPhone, d.memberPhone);
     if (!key10 || !Number.isFinite(amount) || amount <= 0) continue;
     const key = (d.transactionId as string) || `p:${String(d._id)}`;
-    if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
+    if (!txns.has(key)) txns.set(key, { id: key, source: "payments", key10, amount, paidAt: (d.paidAt as Date) ?? null, kind: String(d.kind ?? "") });
   }
 
   for (const d of webhooks) {
@@ -124,18 +142,10 @@ async function paidByPhone(keys: Set<string>, forms: string[]): Promise<Record<s
     if (refund !== "none" && refund !== "") continue;
     if (String(payload.payment_verified ?? "true").toLowerCase() === "false") continue;
     const key = (payload.transaction_id as string) || String(d.dedupeKey ?? "").replace(/^[^:]+:/, "") || `w:${String(d._id)}`;
-    if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
+    if (!txns.has(key)) txns.set(key, { id: key, source: "webhook", key10, amount, paidAt: (d.paidAt as Date) ?? null, kind: "" });
   }
 
-  const byPhone: Record<string, PaidInfo> = {};
-  for (const t of txns.values()) {
-    const cur = (byPhone[t.key10] ??= { amount: 0, txns: 0, lastPaidAt: null });
-    cur.amount += t.amount;
-    cur.txns += 1;
-    const iso = t.paidAt ? new Date(t.paidAt).toISOString() : null;
-    if (iso && (!cur.lastPaidAt || iso > cur.lastPaidAt)) cur.lastPaidAt = iso;
-  }
-  return byPhone;
+  return [...txns.values()];
 }
 
 /** One partner's summary out of the paid-by-phone map. */

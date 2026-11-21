@@ -1,7 +1,8 @@
 import { dbConnect } from "./db";
 import { Lead } from "./models/Lead";
 import { Partner } from "./models/Partner";
-import { fetchTxns, isSalesDbConfigured, phoneForms, phoneKey, shareOf } from "./partner-revenue";
+import { fetchTxns, phoneForms, phoneKey, shareOf } from "./partner-revenue";
+import { isSalesDbConfigured } from "./sales-db";
 
 /** One payment from the Sales CRM, tied to the partner lead it came from. Admin-only (unmasked contact details). */
 export interface PaymentRow {

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { LayoutDashboard, LogOut, Palette, Users, KeyRound, ExternalLink, Menu } from "lucide-react";
 import { ToastProvider } from "@/components/admin/Toast";
+import { SiteLogo } from "@/components/ui/SiteLogo";
 import { useThemeMode } from "@/components/theme-mode";
 
 const NAV = [
@@ -42,19 +43,11 @@ export function PartnerShell({ partner, children }: Props) {
   const nav = (
     <div className="flex h-full flex-col justify-between overflow-y-auto">
       <div>
-        <div className="flex h-16 items-center gap-3 border-b border-hairline px-6">
-          {partner.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={partner.logoUrl} alt="" className="size-9 rounded-xl border border-hairline bg-bg object-contain p-0.5" />
-          ) : (
-            <div className="flex size-9 items-center justify-center rounded-xl bg-accent text-base font-bold text-accent-ink shadow-sm">
-              {partner.name.slice(0, 1).toUpperCase()}
-            </div>
-          )}
-          <div className="min-w-0">
-            <div className="truncate text-cell font-semibold leading-tight text-ink">{partner.name}</div>
-            <div className="text-[11px] font-medium text-mute">Partner Portal</div>
-          </div>
+        <div className="flex h-16 items-center gap-3 border-b border-hairline px-5">
+          <Link href="/partner/portal" onClick={() => setMobileOpen(false)} className="flex min-w-0 items-center">
+            <SiteLogo className="h-9" />
+          </Link>
+          <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">Partner</span>
         </div>
 
         <nav className="space-y-1 p-3">
@@ -81,9 +74,14 @@ export function PartnerShell({ partner, children }: Props) {
 
       <div className="space-y-3 border-t border-hairline p-4">
         <div className="flex items-center gap-3 px-2">
-          <div className="flex size-8 items-center justify-center rounded-full border border-accent/25 bg-accent/15 text-xs font-bold text-accent">
-            {partner.name.slice(0, 2).toUpperCase()}
-          </div>
+          {partner.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={partner.logoUrl} alt="" className="size-8 rounded-full border border-hairline bg-bg object-contain p-0.5" />
+          ) : (
+            <div className="flex size-8 items-center justify-center rounded-full border border-accent/25 bg-accent/15 text-xs font-bold text-accent">
+              {partner.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <span className="block truncate text-meta font-medium text-ink">{partner.name}</span>
             <span className="block truncate text-[11px] text-faint">{partner.loginId || "Partner"}</span>

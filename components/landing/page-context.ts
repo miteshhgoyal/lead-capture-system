@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, type SiteSettingsData } from "@/lib/defaults";
+import type { SiteSettingsData } from "@/lib/defaults";
 import { fillString, resolveSectionContent, type PlaceholderVars } from "@/lib/page-builder/resolve";
 import { buildThemeVars } from "@/lib/page-builder/theme";
 import type {
@@ -94,13 +94,13 @@ export function resolvePage({
 
   const ctx: PageContext = {
     brandName,
-    // No logo uploaded = no image: the navbar/footer show the name in caps instead of someone else's logo.
-    // A partner page only ever shows the partner's own logo; the root page ignores the bundled placeholder.
+    // A partner page only ever shows the partner's own logo (none uploaded = the name in caps).
+    // The root page shows the logo the admin uploaded, else the site logo from /public (light/dark pair).
     logoUrl: isCustomPartner
       ? partner?.logoUrl || ""
-      : settings.logoUrl && settings.logoUrl !== DEFAULT_SETTINGS.logoUrl
+      : settings.logoUrl && settings.logoUrl !== "/tp-logo-light.png"
         ? settings.logoUrl
-        : "",
+        : "/logo-light.png",
     mentorName: partner?.name || settings.defaultMentorName,
     mentorBio: partner?.mentorBio || settings.defaultMentorBio,
     telegramLink: (isCustomPartner ? partner?.telegramLink : "") || settings.defaultTelegramLink || "",

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { ToastProvider } from "./Toast";
+import { SiteLogo } from "@/components/ui/SiteLogo";
 import { useThemeMode } from "@/components/theme-mode";
 
 const navItems = [
@@ -83,16 +84,11 @@ export function AdminShell({ children, title }: { children: ReactNode; title?: s
   const navContent = (
     <div className="flex h-full flex-col justify-between overflow-y-auto">
       <div>
-        <div className="flex h-16 items-center gap-3 px-6 border-b border-hairline">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-accent text-accent-ink font-bold text-base shadow-sm">
-            OS
-          </div>
-          <div>
-            <div className="font-semibold text-cell text-ink leading-tight">
-              Free Course Link
-            </div>
-            <div className="text-[11px] text-mute font-medium">Lead Capture Console</div>
-          </div>
+        <div className="flex h-16 items-center gap-3 border-b border-hairline px-5">
+          <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex min-w-0 items-center">
+            <SiteLogo className="h-9" />
+          </Link>
+          <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">Admin</span>
         </div>
 
         <nav className="p-3 space-y-1">

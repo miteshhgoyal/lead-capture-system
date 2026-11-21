@@ -7386,7 +7386,7 @@ export function BrandLogo({ ctx, className = "h-8" }: { ctx: Pick<PageContext, "
       {isLocal ? (
         <>
           <Image src={logoUrl} alt={brandName} width={180} height={40} priority className={`${className} w-auto object-contain block dark:hidden`} />
-          <Image src="/tp-logo-dark.png" alt={brandName} width={180} height={40} priority className={`${className} w-auto object-contain hidden dark:block`} />
+          <Image src="/logodark.png" alt={brandName} width={180} height={40} priority className={`${className} w-auto object-contain hidden dark:block`} />
         </>
       ) : (
         <img src={logoUrl} alt={brandName} className={`${className} max-w-[160px] object-contain`} />

@@ -39,7 +39,7 @@ export const DEFAULT_SETTINGS: SiteSettingsData = {
     "Senior institutional traders and certified technical analysts sharing real-world market strategies with over 60,000 students worldwide.",
   brandName: "Free Course Link",
   brandTagline: "Zero To Profitable Trader",
-  logoUrl: "/tp-logo-light.png",
+  logoUrl: "/logo-light.png",
   primaryColor: "",
   faqs: [
     {

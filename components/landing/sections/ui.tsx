@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
+import { SITE_LOGO_LIGHT, SiteLogo } from "@/components/ui/SiteLogo";
 import { PartnerSignupForm } from "@/components/partner/PartnerSignupForm";
 import { LeadForm } from "../LeadForm";
 import { AnimatedText } from "../motion/AnimatedText";
@@ -107,7 +107,7 @@ export function CtaButton({
   );
 }
 
-export function BrandLogo({ ctx, className = "h-8" }: { ctx: Pick<PageContext, "logoUrl" | "brandName">; className?: string }) {
+export function BrandLogo({ ctx, className = "h-9" }: { ctx: Pick<PageContext, "logoUrl" | "brandName">; className?: string }) {
   const { logoUrl, brandName } = ctx;
   if (!logoUrl) {
     return (
@@ -116,18 +116,11 @@ export function BrandLogo({ ctx, className = "h-8" }: { ctx: Pick<PageContext, "
       </span>
     );
   }
-  const isLocal = logoUrl.startsWith("/");
+  // The bundled site logo has a light and a dark version; an uploaded logo is one image for both themes.
+  if (logoUrl === SITE_LOGO_LIGHT) return <SiteLogo className={className} alt={brandName} />;
   return (
-    <div className="relative h-8 w-auto min-w-8">
-      {isLocal ? (
-        <>
-          <Image src={logoUrl} alt={brandName} width={180} height={40} priority className={`${className} w-auto object-contain block dark:hidden`} />
-          <Image src="/tp-logo-dark.png" alt={brandName} width={180} height={40} priority className={`${className} w-auto object-contain hidden dark:block`} />
-        </>
-      ) : (
-        <img src={logoUrl} alt={brandName} className={`${className} max-w-[160px] object-contain`} />
-      )}
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={logoUrl} alt={brandName} className={`${className} max-w-[180px] object-contain`} />
   );
 }
 

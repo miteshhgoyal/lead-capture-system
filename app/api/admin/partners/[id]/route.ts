@@ -89,6 +89,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
     if (data.whatsappGroupLink !== undefined) existing.whatsappGroupLink = data.whatsappGroupLink;
     if (data.zoomLink !== undefined) existing.zoomLink = data.zoomLink;
     if (data.isActive !== undefined) existing.isActive = data.isActive;
+    if (data.sharePercent !== undefined) existing.sharePercent = data.sharePercent;
     if (data.tagline !== undefined) existing.tagline = data.tagline;
     if (data.mentorBio !== undefined) existing.mentorBio = data.mentorBio;
     if (data.logoUrl !== undefined) existing.logoUrl = data.logoUrl;

@@ -31,6 +31,7 @@ interface PartnerItem {
   zoomLink?: string;
   isActive: boolean;
   loginId?: string;
+  sharePercent?: number;
   createdBy?: string;
   tagline?: string;
   mentorBio?: string;
@@ -67,6 +68,7 @@ export default function PartnersPage() {
   const [logoUrl, setLogoUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#3b36e0");
   const [isActive, setIsActive] = useState(true);
+  const [sharePercent, setSharePercent] = useState("0");
   const [loginId, setLoginId] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [savingLogin, setSavingLogin] = useState(false);
@@ -143,6 +145,7 @@ export default function PartnersPage() {
     setTestimonials([]);
     setLogoUrl("");
     setPrimaryColor("#3b36e0");
+    setSharePercent("0");
     setIsActive(true);
     setDrawerOpen(true);
   };
@@ -162,6 +165,7 @@ export default function PartnersPage() {
     setLogoUrl(partner.logoUrl || "");
     setPrimaryColor(partner.theme?.primaryColor || "#3b36e0");
     setIsActive(partner.isActive);
+    setSharePercent(String(partner.sharePercent ?? 0));
     setLoginId(partner.loginId || "");
     setNewPassword("");
     setDrawerOpen(true);
@@ -308,6 +312,7 @@ export default function PartnersPage() {
             .filter((t) => t.name && t.quote),
           logoUrl: logoUrl.trim() || undefined,
           isActive,
+          sharePercent: Math.min(100, Math.max(0, Number(sharePercent) || 0)),
           theme: { primaryColor },
         };
 
@@ -904,6 +909,22 @@ export default function PartnersPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Business share (admin only) */}
+          <div className="rounded-xl border border-hairline bg-card p-4">
+            <Field label="Business share %" hint="Share of the revenue from this partner's leads. Shown to the partner in their portal. Only admins can change it.">
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                step="0.01"
+                inputMode="decimal"
+                value={sharePercent}
+                onChange={(e) => setSharePercent(e.target.value)}
+                placeholder="0"
+              />
+            </Field>
           </div>
 
           {/* Portal login (edit only) */}

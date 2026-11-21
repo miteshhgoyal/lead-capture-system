@@ -34,6 +34,8 @@ export interface IPartner {
   seed?: number | null;
   createdBy?: string;
   /** Partner portal login id (lowercase). Absent for partners that have no portal access yet. */
+  /** Business share (0-100) of the revenue from this partner's leads. Admin-only: no partner-facing route writes it. */
+  sharePercent?: number;
   loginId?: string;
   /** scrypt hash (salt:key). Never selected by default: use `.select("+passwordHash")`. */
   passwordHash?: string;
@@ -82,6 +84,7 @@ const partnerSchema = new Schema<IPartner>(
     sectionOrder: { type: Schema.Types.Mixed, default: null },
     seed: { type: Number, default: null },
     createdBy: { type: String, trim: true },
+    sharePercent: { type: Number, default: 0, min: 0, max: 100 },
     loginId: { type: String, lowercase: true, trim: true },
     passwordHash: { type: String, select: false },
   },

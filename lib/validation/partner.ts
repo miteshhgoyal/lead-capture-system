@@ -78,6 +78,7 @@ export const PartnerSchema = z.object({
     .or(z.literal(""))
     .optional(),
   isActive: z.boolean().default(true),
+  sharePercent: z.number().min(0, "Share must be 0-100").max(100, "Share must be 0-100").optional(),
   testimonials: z
     .array(
       z.object({

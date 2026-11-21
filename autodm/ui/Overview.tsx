@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Instagram, Facebook, Plug, Trash2 } from "lucide-react";
+import { AlertTriangle, Plug, Trash2 } from "lucide-react";
 import { Badge, Button, Card, EmptyState, Skeleton } from "@/components/admin/AdminPrimitives";
 import { useToast } from "@/components/admin/Toast";
 import { api, fmt } from "./api";
@@ -69,10 +69,10 @@ export function Overview() {
 
       <div className="flex flex-wrap items-center gap-3">
         {features?.instagram && features.oauth && (
-          <a href="/api/autodm/connect/instagram"><Button type="button" icon={<Instagram className="size-4" aria-hidden />}>Connect Instagram</Button></a>
+          <a href="/api/autodm/connect/instagram"><Button type="button">Connect Instagram</Button></a>
         )}
         {features?.facebook && features.oauth && (
-          <a href="/api/autodm/connect/facebook"><Button type="button" variant="secondary" icon={<Facebook className="size-4" aria-hidden />}>Connect Facebook Page</Button></a>
+          <a href="/api/autodm/connect/facebook"><Button type="button" variant="secondary">Connect Facebook Page</Button></a>
         )}
         {features && !features.oauth && <span className="text-sm text-mute">New connections are currently disabled.</span>}
         <Link href="/autodm/automations" className="ml-auto text-sm font-semibold text-accent hover:underline">Automations →</Link>

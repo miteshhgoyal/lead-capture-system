@@ -21,6 +21,8 @@ export interface PageContext {
   navLinks: { id: string; label: string }[];
   /** Dev preview: the lead form is replaced by a static placeholder so nothing can be submitted. */
   preview?: boolean;
+  /** Which form the hero shows: the visitor lead form (default) or the partner sign-up form. */
+  formMode?: "lead" | "partner";
 }
 
 /** Every variant of a section takes exactly these props so they are interchangeable. */

@@ -16,12 +16,14 @@ interface LandingPageProps {
   page?: PagePlan | null;
   /** Dev preview: renders the lead form as an inert placeholder. */
   preview?: boolean;
+  /** `partner` swaps the hero's lead form for the partner sign-up form (the `/` page). */
+  formMode?: "lead" | "partner";
 }
 
 /** The original design: variant 1 and the original copy for every section. */
 const ORIGINAL_PAGE: PagePlan = generatePartnerPage({}, { legacy: true, seed: 0 });
 
-function PageBody({ page, plan }: { page: ReturnType<typeof resolvePage>; plan: PagePlan }) {
+function PageBody({ page, plan, formMode }: { page: ReturnType<typeof resolvePage>; plan: PagePlan; formMode: "lead" | "partner" }) {
   const preset = useAnimationPreset();
   const style = page.themeVars as CSSProperties;
   const { order, content, ctx } = page;
@@ -45,6 +47,14 @@ function PageBody({ page, plan }: { page: ReturnType<typeof resolvePage>; plan: 
         <div className="f-blob c" />
       </div>
 
+      {formMode === "partner" && (
+        <div className="relative z-20 border-b border-hairline bg-card/80 px-4 py-2 text-center text-xs text-mute backdrop-blur">
+          Already a partner?{" "}
+          <a href="/partner/login" className="font-semibold text-accent hover:underline">
+            Sign in to your portal
+          </a>
+        </div>
+      )}
       {order.filter((k) => k === "navbar").map(render)}
       <main className="relative z-10">{order.filter((k) => k !== "navbar" && k !== "footer").map(render)}</main>
       {order.filter((k) => k === "footer").map(render)}
@@ -53,12 +63,12 @@ function PageBody({ page, plan }: { page: ReturnType<typeof resolvePage>; plan: 
 }
 
 /** Renders a partner's saved page (or the original design) through the section registry. */
-export function LandingPage({ partner, settings, isCustomPartner = false, page, preview = false }: LandingPageProps) {
+export function LandingPage({ partner, settings, isCustomPartner = false, page, preview = false, formMode = "lead" }: LandingPageProps) {
   const plan = page ?? ORIGINAL_PAGE;
-  const resolved = resolvePage({ partner, settings, isCustomPartner, plan, preview });
+  const resolved = resolvePage({ partner, settings, isCustomPartner, plan, preview, formMode });
   return (
     <AnimationProvider style={plan.themeConfig.animationStyle}>
-      <PageBody page={resolved} plan={plan} />
+      <PageBody page={resolved} plan={plan} formMode={formMode} />
     </AnimationProvider>
   );
 }

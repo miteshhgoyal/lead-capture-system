@@ -37,7 +37,7 @@ const EMPTY: PartnerRevenue = { available: true, totalRevenue: 0, transactions: 
 const CACHE_MS = 60_000;
 const CHUNK = 800;
 
-const g = globalThis as unknown as { _revCache?: Map<string, { at: number; v: PartnerRevenue }> };
+const g = globalThis as unknown as { _revCache?: Map<string, { at: number; v: unknown }> };
 const cache = (g._revCache ??= new Map());
 
 interface Txn {
@@ -46,129 +46,196 @@ interface Txn {
   paidAt: Date | null;
 }
 
+/** Every phone spelling the Sales CRM might store for these leads: "+91..", "91..", "98..". */
+function phoneForms(phones: string[]): string[] {
+  const forms = new Set<string>();
+  for (const phone of phones) {
+    const k = phoneKey(phone);
+    if (!k) continue;
+    const digits = phone.replace(/\D/g, "");
+    forms.add(phone);
+    forms.add(digits);
+    forms.add(`+${digits}`);
+    forms.add(k);
+  }
+  return [...forms];
+}
+
 /**
- * Revenue that came from a partner's leads: lead phone numbers are matched against the Sales CRM's
- * `payments` (status SUCCESS) and `webhookevents` (verified, non-refunded purchases), and the two are
- * unioned by transaction id so a payment that sits in both is counted once.
- * Read-only. Cached for a minute per partner.
+ * The core match. Looks the given phone keys up in the Sales CRM and returns paid totals per phone key.
+ * `payments` (status SUCCESS) is the source of truth; `webhookevents` (verified, non-refunded purchases)
+ * add what payments lacks. Both are unioned by transaction id, so one payment is counted once.
+ * Read-only: `find` with projections only.
  */
+async function paidByPhone(keys: Set<string>, forms: string[]): Promise<Record<string, PaidInfo>> {
+  const db = await getSalesDb();
+  const txns = new Map<string, Txn>();
+  const keyOf = (...phones: unknown[]) => phones.map(phoneKey).find((k) => k && keys.has(k)) ?? "";
+
+  const payments: Record<string, unknown>[] = [];
+  const webhooks: Record<string, unknown>[] = [];
+  for (let i = 0; i < forms.length; i += CHUNK) {
+    const chunk = forms.slice(i, i + CHUNK);
+    const [p, w] = await Promise.all([
+      db
+        .collection("payments")
+        .find(
+          { status: "SUCCESS", $or: [{ leadPhone: { $in: chunk } }, { memberPhone: { $in: chunk } }] },
+          { projection: { transactionId: 1, amount: 1, paidAt: 1, leadPhone: 1, memberPhone: 1 } }
+        )
+        .toArray(),
+      db
+        .collection("webhookevents")
+        .find(
+          { eventType: "purchase", $or: [{ "payload.phone": { $in: chunk } }, { "payload.buyer_phone": { $in: chunk } }] },
+          {
+            projection: {
+              dedupeKey: 1,
+              amount: 1,
+              paidAt: 1,
+              "payload.transaction_id": 1,
+              "payload.phone": 1,
+              "payload.buyer_phone": 1,
+              "payload.refund_status": 1,
+              "payload.payment_verified": 1,
+            },
+          }
+        )
+        .toArray(),
+    ]);
+    payments.push(...(p as Record<string, unknown>[]));
+    webhooks.push(...(w as Record<string, unknown>[]));
+  }
+
+  for (const d of payments) {
+    const amount = Number(d.amount);
+    const key10 = keyOf(d.leadPhone, d.memberPhone);
+    if (!key10 || !Number.isFinite(amount) || amount <= 0) continue;
+    const key = (d.transactionId as string) || `p:${String(d._id)}`;
+    if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
+  }
+
+  for (const d of webhooks) {
+    const payload = (d.payload ?? {}) as Record<string, unknown>;
+    const amount = Number(d.amount);
+    const key10 = keyOf(payload.phone, payload.buyer_phone);
+    if (!key10 || !Number.isFinite(amount) || amount <= 0) continue;
+    const refund = String(payload.refund_status ?? "none").toLowerCase();
+    if (refund !== "none" && refund !== "") continue;
+    if (String(payload.payment_verified ?? "true").toLowerCase() === "false") continue;
+    const key = (payload.transaction_id as string) || String(d.dedupeKey ?? "").replace(/^[^:]+:/, "") || `w:${String(d._id)}`;
+    if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
+  }
+
+  const byPhone: Record<string, PaidInfo> = {};
+  for (const t of txns.values()) {
+    const cur = (byPhone[t.key10] ??= { amount: 0, txns: 0, lastPaidAt: null });
+    cur.amount += t.amount;
+    cur.txns += 1;
+    const iso = t.paidAt ? new Date(t.paidAt).toISOString() : null;
+    if (iso && (!cur.lastPaidAt || iso > cur.lastPaidAt)) cur.lastPaidAt = iso;
+  }
+  return byPhone;
+}
+
+/** One partner's summary out of the paid-by-phone map. */
+function summarize(leadsOfPartner: { id: string; key: string }[], paid: Record<string, PaidInfo>): PartnerRevenue {
+  const keys = new Set(leadsOfPartner.map((l) => l.key));
+  const byPhone: Record<string, PaidInfo> = {};
+  let totalRevenue = 0;
+  let transactions = 0;
+  for (const k of keys) {
+    const info = paid[k];
+    if (!info) continue;
+    byPhone[k] = info;
+    totalRevenue += info.amount;
+    transactions += info.txns;
+  }
+  return {
+    available: true,
+    totalRevenue,
+    transactions,
+    payingCustomers: Object.keys(byPhone).length,
+    byPhone,
+    payingLeadIds: leadsOfPartner.filter((l) => byPhone[l.key]).map((l) => l.id),
+  };
+}
+
+/** Revenue that came from one partner's leads. Cached for a minute. */
 export async function getPartnerRevenue(partner: { _id: unknown; slug: string }): Promise<PartnerRevenue> {
   if (!isSalesDbConfigured()) return { ...EMPTY, available: false, reason: "not_configured" };
 
-  const cacheKey = String(partner._id);
+  const cacheKey = `p:${String(partner._id)}`;
   const hit = cache.get(cacheKey);
-  if (hit && Date.now() - hit.at < CACHE_MS) return hit.v;
+  if (hit && Date.now() - hit.at < CACHE_MS) return hit.v as PartnerRevenue;
 
   try {
     await dbConnect();
     const leads = await Lead.find(partnerLeadMatch(partner) as never).select("phone").lean();
-
-    const idsByKey = new Map<string, string[]>();
-    const forms = new Set<string>();
-    for (const l of leads) {
-      const k = phoneKey(l.phone);
-      if (!k) continue;
-      (idsByKey.get(k) ?? idsByKey.set(k, []).get(k)!).push(String(l._id));
-      const digits = String(l.phone).replace(/\D/g, "");
-      forms.add(String(l.phone));
-      forms.add(digits);
-      forms.add(`+${digits}`);
-      forms.add(k);
-    }
-    if (idsByKey.size === 0) {
+    const mine = leads.map((l) => ({ id: String(l._id), key: phoneKey(l.phone), phone: String(l.phone) })).filter((l) => l.key);
+    if (mine.length === 0) {
       cache.set(cacheKey, { at: Date.now(), v: EMPTY });
       return EMPTY;
     }
-
-    const db = await getSalesDb();
-    const txns = new Map<string, Txn>();
-    const keyOf = (...phones: unknown[]) => phones.map(phoneKey).find((k) => k && idsByKey.has(k)) ?? "";
-    const list = [...forms];
-
-    const payments: Record<string, unknown>[] = [];
-    const webhooks: Record<string, unknown>[] = [];
-    for (let i = 0; i < list.length; i += CHUNK) {
-      const chunk = list.slice(i, i + CHUNK);
-      const [p, w] = await Promise.all([
-        db
-          .collection("payments")
-          .find(
-            { status: "SUCCESS", $or: [{ leadPhone: { $in: chunk } }, { memberPhone: { $in: chunk } }] },
-            { projection: { transactionId: 1, amount: 1, paidAt: 1, leadPhone: 1, memberPhone: 1 } }
-          )
-          .toArray(),
-        db
-          .collection("webhookevents")
-          .find(
-            { eventType: "purchase", $or: [{ "payload.phone": { $in: chunk } }, { "payload.buyer_phone": { $in: chunk } }] },
-            {
-              projection: {
-                dedupeKey: 1,
-                amount: 1,
-                paidAt: 1,
-                "payload.transaction_id": 1,
-                "payload.phone": 1,
-                "payload.buyer_phone": 1,
-                "payload.refund_status": 1,
-                "payload.payment_verified": 1,
-              },
-            }
-          )
-          .toArray(),
-      ]);
-      payments.push(...(p as Record<string, unknown>[]));
-      webhooks.push(...(w as Record<string, unknown>[]));
-    }
-
-    // 1) payments are the source of truth
-    for (const d of payments) {
-      const amount = Number(d.amount);
-      const key10 = keyOf(d.leadPhone, d.memberPhone);
-      if (!key10 || !Number.isFinite(amount) || amount <= 0) continue;
-      const key = (d.transactionId as string) || `p:${String(d._id)}`;
-      if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
-    }
-
-    // 2) webhook events add whatever payments does not have yet (same transaction id = same payment)
-    for (const d of webhooks) {
-      const payload = (d.payload ?? {}) as Record<string, unknown>;
-      const amount = Number(d.amount);
-      const key10 = keyOf(payload.phone, payload.buyer_phone);
-      if (!key10 || !Number.isFinite(amount) || amount <= 0) continue;
-      const refund = String(payload.refund_status ?? "none").toLowerCase();
-      if (refund !== "none" && refund !== "") continue;
-      if (String(payload.payment_verified ?? "true").toLowerCase() === "false") continue;
-      const key =
-        (payload.transaction_id as string) ||
-        String(d.dedupeKey ?? "").replace(/^[^:]+:/, "") ||
-        `w:${String(d._id)}`;
-      if (!txns.has(key)) txns.set(key, { key10, amount, paidAt: (d.paidAt as Date) ?? null });
-    }
-
-    const byPhone: Record<string, PaidInfo> = {};
-    let totalRevenue = 0;
-    for (const t of txns.values()) {
-      const cur = (byPhone[t.key10] ??= { amount: 0, txns: 0, lastPaidAt: null });
-      cur.amount += t.amount;
-      cur.txns += 1;
-      const iso = t.paidAt ? new Date(t.paidAt).toISOString() : null;
-      if (iso && (!cur.lastPaidAt || iso > cur.lastPaidAt)) cur.lastPaidAt = iso;
-      totalRevenue += t.amount;
-    }
-
-    const value: PartnerRevenue = {
-      available: true,
-      totalRevenue,
-      transactions: txns.size,
-      payingCustomers: Object.keys(byPhone).length,
-      byPhone,
-      payingLeadIds: Object.keys(byPhone).flatMap((k) => idsByKey.get(k) ?? []),
-    };
+    const paid = await paidByPhone(new Set(mine.map((l) => l.key)), phoneForms(mine.map((l) => l.phone)));
+    const value = summarize(mine, paid);
     cache.set(cacheKey, { at: Date.now(), v: value });
     return value;
   } catch (e) {
     console.error("[partner-revenue] Sales DB read failed:", e);
     return { ...EMPTY, available: false, reason: "unreachable" };
+  }
+}
+
+export interface PartnerRevenueRow {
+  totalRevenue: number;
+  transactions: number;
+  payingCustomers: number;
+}
+
+/**
+ * Revenue for every partner in one pass (admin table): all leads are read once, the Sales CRM is
+ * queried once, and the result is split per partner. Keyed by partner id (string).
+ */
+export async function getRevenueForPartners(
+  partners: { _id: unknown; slug: string }[]
+): Promise<{ available: boolean; reason?: PartnerRevenue["reason"]; byPartner: Map<string, PartnerRevenueRow> }> {
+  const byPartner = new Map<string, PartnerRevenueRow>();
+  if (!isSalesDbConfigured()) return { available: false, reason: "not_configured", byPartner };
+
+  const hit = cache.get("all");
+  if (hit && Date.now() - hit.at < CACHE_MS) return hit.v as { available: boolean; byPartner: Map<string, PartnerRevenueRow> };
+
+  try {
+    await dbConnect();
+    const idBySlug = new Map(partners.map((p) => [p.slug, String(p._id)]));
+    const leads = await Lead.find({}).select("partnerId partnerSlug phone").lean();
+
+    const perPartner = new Map<string, { id: string; key: string }[]>();
+    const allKeys = new Set<string>();
+    const allPhones: string[] = [];
+    for (const l of leads) {
+      const key = phoneKey(l.phone);
+      const pid = l.partnerId ? String(l.partnerId) : idBySlug.get(l.partnerSlug);
+      if (!key || !pid) continue;
+      (perPartner.get(pid) ?? perPartner.set(pid, []).get(pid)!).push({ id: String(l._id), key });
+      if (!allKeys.has(key)) {
+        allKeys.add(key);
+        allPhones.push(String(l.phone));
+      }
+    }
+
+    const paid = allKeys.size ? await paidByPhone(allKeys, phoneForms(allPhones)) : {};
+    for (const [pid, ls] of perPartner) {
+      const s = summarize(ls, paid);
+      byPartner.set(pid, { totalRevenue: s.totalRevenue, transactions: s.transactions, payingCustomers: s.payingCustomers });
+    }
+    const value = { available: true, byPartner };
+    cache.set("all", { at: Date.now(), v: value });
+    return value;
+  } catch (e) {
+    console.error("[partner-revenue] Sales DB read failed (all partners):", e);
+    return { available: false, reason: "unreachable", byPartner };
   }
 }
 

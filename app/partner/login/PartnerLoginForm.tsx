@@ -56,7 +56,7 @@ export function PartnerLoginForm() {
             {busy ? "Signing in…" : <>Sign in <ArrowRight className="ml-1 inline size-4" aria-hidden /></>}
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-mute">New here? <Link href="/partners/join" className="font-semibold text-accent">Become a partner</Link></p>
+        <p className="mt-6 text-center text-sm text-mute">New here? <Link href="/partner/join" className="font-semibold text-accent">Become a partner</Link></p>
       </div>
     </div>
   );

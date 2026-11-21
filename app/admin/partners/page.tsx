@@ -6,12 +6,14 @@ import {
   Card,
   Input,
   Field,
+  StatTile,
 } from "@/components/admin/AdminPrimitives";
 import { Drawer } from "@/components/admin/Drawer";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/Toast";
 import { slugify, isReservedSlug } from "@/lib/validation/partner";
 import { getReadableTextColor } from "@/lib/theme-utils";
+import { compactINR, formatINR } from "@/lib/format";
 import { ArrowRight, Check, Copy, ExternalLink, Plus, Shuffle, Trash2, X } from "lucide-react";
 
 interface TestimonialInput {
@@ -41,12 +43,20 @@ interface PartnerItem {
     primaryColor: string;
   };
   leadsCount: number;
+  last7Days?: number;
+  last30Days?: number;
+  joinedCount?: number;
+  revenue?: number;
+  payingCustomers?: number;
+  shareValue?: number;
   createdAt: string;
 }
 
 export default function PartnersPage() {
   const { showToast } = useToast();
   const [partners, setPartners] = useState<PartnerItem[]>([]);
+  const [revenueAvailable, setRevenueAvailable] = useState(true);
+  const [sortBy, setSortBy] = useState<"newest" | "leads" | "revenue" | "share">("newest");
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<PartnerItem | null>(null);
@@ -83,6 +93,7 @@ export default function PartnersPage() {
       const json = await res.json();
       if (json.ok) {
         setPartners(json.partners);
+        setRevenueAvailable(json.revenueAvailable !== false);
       }
     } catch {
       showToast("Failed to load partners", "error");
@@ -358,6 +369,23 @@ export default function PartnersPage() {
     `${typeof window !== "undefined" ? window.location.origin : ""}/${partner.slug}`;
 
   /* Shared pieces used by both the mobile card list and the desktop table */
+  const sorted = [...partners].sort((a, b) => {
+    if (sortBy === "leads") return b.leadsCount - a.leadsCount;
+    if (sortBy === "revenue") return (b.revenue ?? 0) - (a.revenue ?? 0);
+    if (sortBy === "share") return (b.shareValue ?? 0) - (a.shareValue ?? 0);
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  const totals = partners.reduce(
+    (t, p) => ({
+      leads: t.leads + p.leadsCount,
+      revenue: t.revenue + (p.revenue ?? 0),
+      share: t.share + (p.shareValue ?? 0),
+      active: t.active + (p.isActive ? 1 : 0),
+    }),
+    { leads: 0, revenue: 0, share: 0, active: 0 }
+  );
+  const money = (n: number | undefined) => (revenueAvailable ? formatINR(n ?? 0) : "–");
+
   const renderAvatar = (partner: PartnerItem): ReactNode =>
     partner.logoUrl ? (
       <img
@@ -410,6 +438,14 @@ export default function PartnersPage() {
         </svg>
       </a>
 
+      <a
+        href={`/admin/leads?partnerSlug=${partner.slug}`}
+        className="rounded-lg px-2 py-2 text-xs font-semibold text-accent hover:bg-bg-alt"
+        title="View this partner's leads"
+      >
+        Leads
+      </a>
+
       <button
         onClick={() => openEditModal(partner)}
         className="rounded-lg p-2 text-mute hover:text-accent hover:bg-bg-alt"
@@ -449,9 +485,9 @@ export default function PartnersPage() {
       {/* Top Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">Partners Management</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-ink">Partners</h1>
           <p className="mt-1 text-sm text-mute">
-            Create zero-redeploy partner landing pages with custom themes, links, and branding.
+            Every partner in one place: pages, leads, revenue from their leads, and the business share you pay them.
           </p>
         </div>
 
@@ -461,6 +497,23 @@ export default function PartnersPage() {
         >
           + Add New Partner
         </Button>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatTile label="Partners" value={partners.length.toLocaleString()} subtext={`${totals.active} active`} />
+        <StatTile label="Leads via partners" value={totals.leads.toLocaleString()} />
+        <StatTile label="Revenue from partner leads" value={revenueAvailable ? compactINR(totals.revenue) : "–"} subtext={revenueAvailable ? formatINR(totals.revenue) : "Sales DB not connected"} />
+        <StatTile label="Partner share (total)" value={revenueAvailable ? compactINR(totals.share) : "–"} subtext={revenueAvailable ? formatINR(totals.share) : undefined} />
+      </div>
+      <div className="flex items-center justify-end gap-2 text-xs text-mute">
+        <span>Sort by</span>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)} className="rounded-lg border border-hairline bg-bg px-2 py-1 text-xs text-ink">
+          <option value="newest">Newest</option>
+          <option value="leads">Most leads</option>
+          <option value="revenue">Most revenue</option>
+          <option value="share">Highest share value</option>
+        </select>
       </div>
 
       {/* Success Live URL Banner (shown after creation/update) */}
@@ -513,7 +566,7 @@ export default function PartnersPage() {
             No partners created yet. Tap "+ Add New Partner" to launch your first partner!
           </div>
         ) : (
-          partners.map((partner) => {
+          sorted.map((partner) => {
             const liveUrl = getLiveUrl(partner);
             return (
               <div key={partner._id} className="rounded-2xl border border-hairline bg-card p-4">
@@ -548,6 +601,21 @@ export default function PartnersPage() {
                   <span>{new Date(partner.createdAt).toLocaleDateString()}</span>
                 </div>
 
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-bg-alt/50 p-2.5">
+                    <div className="text-sm font-bold text-ink">{money(partner.revenue)}</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">Revenue</div>
+                  </div>
+                  <div className="rounded-xl bg-bg-alt/50 p-2.5">
+                    <div className="text-sm font-bold text-ink">{partner.sharePercent ?? 0}%</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">Share</div>
+                  </div>
+                  <div className="rounded-xl bg-bg-alt/50 p-2.5">
+                    <div className="text-sm font-bold text-up">{money(partner.shareValue)}</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">Share value</div>
+                  </div>
+                </div>
+
                 <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline pt-3">
                   <button
                     onClick={() => copyToClipboard(liveUrl)}
@@ -569,96 +637,107 @@ export default function PartnersPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-hairline bg-bg-alt/50 text-xs font-semibold uppercase tracking-wider text-mute">
               <tr>
-                <th className="px-6 py-4">Partner</th>
-                <th className="px-6 py-4">Live URL</th>
-                <th className="px-6 py-4">Telegram</th>
-                <th className="px-6 py-4">Leads</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Created</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-4 py-4">Partner</th>
+                <th className="px-4 py-4">Leads</th>
+                <th className="px-4 py-4">Joined</th>
+                <th className="px-4 py-4 text-right">Revenue</th>
+                <th className="px-4 py-4 text-right">Share %</th>
+                <th className="px-4 py-4 text-right">Share value</th>
+                <th className="px-4 py-4">Status</th>
+                <th className="px-4 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-hairline">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-mute">
+                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-mute">
                     Loading partners...
                   </td>
                 </tr>
               ) : partners.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-mute">
+                  <td colSpan={8} className="px-6 py-12 text-center text-sm text-mute">
                     No partners created yet. Click "+ Add New Partner" to launch your first partner!
                   </td>
                 </tr>
               ) : (
-                partners.map((partner) => {
+                sorted.map((partner) => {
                   const liveUrl = getLiveUrl(partner);
+                  const conv = partner.leadsCount > 0 ? Math.round(((partner.joinedCount ?? 0) / partner.leadsCount) * 100) : 0;
 
                   return (
                     <tr key={partner._id} className="transition hover:bg-bg-alt/30">
-                      {/* Name & Logo */}
-                      <td className="px-6 py-4">
+                      {/* Partner */}
+                      <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
                           {renderAvatar(partner)}
-                          <div>
-                            <div className="font-semibold text-ink">{partner.name}</div>
-                            <div className="text-xs text-mute font-mono">/{partner.slug}</div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="truncate font-semibold text-ink">{partner.name}</span>
+                              {partner.createdBy === "self-signup" && (
+                                <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">Self sign-up</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-mute">
+                              <span className="font-mono">/{partner.slug}</span>
+                              <button
+                                onClick={() => copyToClipboard(liveUrl)}
+                                title="Copy full URL"
+                                aria-label="Copy full URL"
+                                className="rounded-md p-0.5 text-mute hover:bg-bg-alt hover:text-ink"
+                              >
+                                <Copy className="size-3" aria-hidden />
+                              </button>
+                              <span className="text-faint">· {new Date(partner.createdAt).toLocaleDateString()}</span>
+                            </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* Live URL */}
-                      <td className="px-6 py-4">
+                      {/* Leads */}
+                      <td className="px-4 py-4">
+                        <div className="text-base font-extrabold text-ink">{partner.leadsCount.toLocaleString()}</div>
+                        <div className="text-[11px] text-mute">{(partner.last7Days ?? 0).toLocaleString()} / 7d · {(partner.last30Days ?? 0).toLocaleString()} / 30d</div>
+                      </td>
+
+                      {/* Joined */}
+                      <td className="px-4 py-4">
+                        <span className="font-bold text-up">{(partner.joinedCount ?? 0).toLocaleString()}</span>
+                        <span className="ml-1 text-[11px] text-mute">({conv}%)</span>
+                      </td>
+
+                      {/* Revenue from this partner's leads */}
+                      <td className="px-4 py-4 text-right">
+                        <div className="font-semibold tabular-nums text-ink">{money(partner.revenue)}</div>
+                        {revenueAvailable && (partner.payingCustomers ?? 0) > 0 && (
+                          <div className="text-[11px] text-mute">{partner.payingCustomers} paying</div>
+                        )}
+                      </td>
+
+                      {/* Share % */}
+                      <td className="px-4 py-4 text-right">
+                        <button
+                          onClick={() => openEditModal(partner)}
+                          title="Edit share"
+                          className="rounded-lg px-2 py-1 font-semibold tabular-nums text-ink hover:bg-bg-alt"
+                        >
+                          {partner.sharePercent ?? 0}%
+                        </button>
+                      </td>
+
+                      {/* Share value */}
+                      <td className="px-4 py-4 text-right font-semibold tabular-nums text-up">{money(partner.shareValue)}</td>
+
+                      {/* Status Toggle */}
+                      <td className="px-4 py-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs text-ink">/{partner.slug}</span>
-                          <button
-                            onClick={() => copyToClipboard(liveUrl)}
-                            title="Copy full URL"
-                            className="rounded-md border border-hairline p-1 text-mute hover:text-ink hover:bg-bg-alt"
-                          >
-                            <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                            </svg>
-                          </button>
+                          {renderToggle(partner)}
+                          <span className="text-[11px] font-semibold text-mute">{partner.isActive ? "Active" : "Inactive"}</span>
                         </div>
                       </td>
 
-                      {/* Telegram */}
-                      <td className="px-6 py-4">
-                        <a
-                          href={partner.telegramLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline truncate max-w-[150px]"
-                        >
-                          <span>Telegram</span>
-                          <svg className="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                          </svg>
-                        </a>
-                      </td>
-
-                      {/* Leads Count */}
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-bold text-accent">
-                          {partner.leadsCount.toLocaleString()}
-                        </span>
-                      </td>
-
-                      {/* Status Toggle */}
-                      <td className="px-6 py-4">{renderToggle(partner)}</td>
-
-                      {/* Created */}
-                      <td className="px-6 py-4 text-xs text-mute">
-                        {new Date(partner.createdAt).toLocaleDateString()}
-                      </td>
-
                       {/* Actions */}
-                      <td className="px-6 py-4 text-right">{renderActions(partner)}</td>
+                      <td className="px-4 py-4 text-right">{renderActions(partner)}</td>
                     </tr>
                   );
                 })

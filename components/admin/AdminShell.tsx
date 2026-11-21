@@ -45,16 +45,6 @@ const navItems = [
     ),
   },
   {
-    href: "/admin/performance",
-    label: "Partner Performance",
-    icon: (
-      <svg className="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 3v18h18" />
-        <path d="m7 15 4-4 3 3 5-6" />
-      </svg>
-    ),
-  },
-  {
     href: "/admin/settings",
     label: "Settings",
     icon: (

@@ -4,6 +4,7 @@ import { Partner, type IPartner } from "../models/Partner";
 import { SiteSettings, type ISiteSettings } from "../models/SiteSettings";
 import { generatePartnerPage, type GenerateOptions } from "./generate";
 import type { PartnerPageConfig } from "./types";
+import { generateProgramPage } from "./program";
 import { hasPageConfig } from "./validate";
 
 function toUpdate(config: PartnerPageConfig) {
@@ -64,7 +65,8 @@ export async function getRootPage(): Promise<PartnerPageConfig | null> {
 /** Admin action: shuffles the root page. `legacy` restores the original design. */
 export async function regenerateRootPage(options: GenerateOptions = {}): Promise<PartnerPageConfig> {
   await dbConnect();
-  const generated = generatePartnerPage({}, options);
+  // The root page is the Partner Program page: same shuffler, program copy.
+  const generated = generateProgramPage(options);
   await SiteSettings.updateOne({ key: "main" }, { $set: toUpdate(generated) }, { upsert: true });
   return generated;
 }

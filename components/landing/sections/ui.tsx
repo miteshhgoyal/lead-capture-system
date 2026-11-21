@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { PartnerSignupForm } from "@/components/partner/PartnerSignupForm";
 import { LeadForm } from "../LeadForm";
 import { AnimatedText } from "../motion/AnimatedText";
 import { Reveal } from "../motion/Reveal";
@@ -108,7 +109,13 @@ export function CtaButton({
 
 export function BrandLogo({ ctx, className = "h-8" }: { ctx: Pick<PageContext, "logoUrl" | "brandName">; className?: string }) {
   const { logoUrl, brandName } = ctx;
-  if (!logoUrl) return null;
+  if (!logoUrl) {
+    return (
+      <span className="block max-w-[220px] truncate text-lg font-extrabold uppercase leading-8 tracking-wide text-ink" title={brandName}>
+        {brandName}
+      </span>
+    );
+  }
   const isLocal = logoUrl.startsWith("/");
   return (
     <div className="relative h-8 w-auto min-w-8">
@@ -133,6 +140,7 @@ export function HeroForm({ ctx }: { ctx: PageContext }) {
       </div>
     );
   }
+  if (ctx.formMode === "partner") return <PartnerSignupForm />;
   return <LeadForm partnerSlug={ctx.partnerSlug} partnerName={ctx.mentorName} telegramLink={ctx.telegramLink} whatsappLink={ctx.whatsappLink} />;
 }
 

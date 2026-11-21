@@ -1,4 +1,4 @@
-import type { SiteSettingsData } from "@/lib/defaults";
+import { DEFAULT_SETTINGS, type SiteSettingsData } from "@/lib/defaults";
 import { fillString, resolveSectionContent, type PlaceholderVars } from "@/lib/page-builder/resolve";
 import { buildThemeVars } from "@/lib/page-builder/theme";
 import type {
@@ -57,12 +57,14 @@ export function resolvePage({
   isCustomPartner,
   plan,
   preview = false,
+  formMode = "lead",
 }: {
   partner?: PartnerView | null;
   settings: SiteSettingsData;
   isCustomPartner: boolean;
   plan: PagePlan;
   preview?: boolean;
+  formMode?: "lead" | "partner";
 }): ResolvedPage {
   const brandName = isCustomPartner && partner?.name ? partner.name : settings.brandName;
   const tagline = isCustomPartner && partner?.tagline ? partner.tagline : undefined;
@@ -92,7 +94,13 @@ export function resolvePage({
 
   const ctx: PageContext = {
     brandName,
-    logoUrl: partner?.logoUrl || settings.logoUrl || "/tp-logo-light.png",
+    // No logo uploaded = no image: the navbar/footer show the name in caps instead of someone else's logo.
+    // A partner page only ever shows the partner's own logo; the root page ignores the bundled placeholder.
+    logoUrl: isCustomPartner
+      ? partner?.logoUrl || ""
+      : settings.logoUrl && settings.logoUrl !== DEFAULT_SETTINGS.logoUrl
+        ? settings.logoUrl
+        : "",
     mentorName: partner?.name || settings.defaultMentorName,
     mentorBio: partner?.mentorBio || settings.defaultMentorBio,
     telegramLink: (isCustomPartner ? partner?.telegramLink : "") || settings.defaultTelegramLink || "",
@@ -104,6 +112,7 @@ export function resolvePage({
     testimonials,
     navLinks,
     preview,
+    formMode,
   };
 
   const primary = (isCustomPartner ? partner?.theme?.primaryColor : settings.primaryColor) || undefined;

@@ -21,7 +21,7 @@ function Go({ children, className = "" }: { children: string; className?: string
 /** Variant 4: centred text on a soft aurora band. */
 export function Cta4({ content, ctx }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam relative overflow-hidden py-20 text-center lg:py-28">
+    <section className="relative overflow-hidden py-20 text-center lg:py-28">
       <Aurora fade="y" />
       <Container size="md" className="relative">
         <Eyebrow>{content.eyebrow}</Eyebrow>
@@ -41,7 +41,7 @@ export function Cta4({ content, ctx }: CtaProps) {
 /** Variant 5: a card lit by falling beams, circled by a comet. */
 export function Cta5({ content }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam py-16 lg:py-24">
+    <section className="py-16 lg:py-24">
       <Container size="lg">
         <Reveal>
           <StarBorder>
@@ -64,7 +64,7 @@ export function Cta5({ content }: CtaProps) {
 /** Variant 6: text on the left, the button standing on a glowing orb with rings on the right. */
 export function Cta6({ content }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam py-16 lg:py-24">
+    <section className="py-16 lg:py-24">
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-14">
           <Reveal>
@@ -86,7 +86,7 @@ export function Cta6({ content }: CtaProps) {
 /** Variant 7: centred text standing on a perspective grid floor. */
 export function Cta7({ content }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam relative overflow-hidden pb-36 pt-16 text-center lg:pb-44 lg:pt-24">
+    <section className="relative overflow-hidden pb-36 pt-16 text-center lg:pb-44 lg:pt-24">
       <RetroGrid />
       <Container size="md" className="relative">
         <Eyebrow>{content.eyebrow}</Eyebrow>
@@ -101,7 +101,7 @@ export function Cta7({ content }: CtaProps) {
 /** Variant 8: a slim banner. Headline on the left, the button on the right. */
 export function Cta8({ content }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam py-12 lg:py-16">
+    <section className="py-12 lg:py-16">
       <Container size="lg">
         <Reveal className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-hairline bg-card p-6 shadow-lg sm:p-8 md:flex-row md:items-center">
           <div className="min-w-0">
@@ -121,7 +121,7 @@ export function Cta8({ content }: CtaProps) {
 /** Variant 9: a gradient-bordered card with a drifting particle network. */
 export function Cta9({ content }: CtaProps) {
   return (
-    <section className="rt-defer rt-seam py-16 lg:py-24">
+    <section className="py-16 lg:py-24">
       <Container size="lg">
         <Reveal className="f-gborder relative overflow-hidden rounded-3xl p-8 text-center shadow-xl sm:p-14">
           <Particles fade="none" count={34} />

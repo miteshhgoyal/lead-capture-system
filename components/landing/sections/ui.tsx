@@ -33,7 +33,7 @@ export function Section({
   deferred?: boolean;
 }) {
   return (
-    <section id={id} className={`${deferred ? "rt-defer " : ""}scroll-mt-20 rt-seam ${className}`.trim()}>
+    <section id={id} className={`${deferred ? "" : ""}scroll-mt-20 ${className}`.trim()}>
       {children}
     </section>
   );

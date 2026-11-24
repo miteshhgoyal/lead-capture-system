@@ -611,7 +611,7 @@ noscript .fg-draw {
 }
 
 /* ── Landing: themed primitives ─────────────────────────────────────────────── */
-.rt-defer { content-visibility: auto; contain-intrinsic-size: auto 640px; }
+.{ content-visibility: auto; contain-intrinsic-size: auto 640px; }
 
 .rt-btn {
   display: inline-flex;
@@ -740,12 +740,12 @@ noscript .fg-draw {
 .rt-scrollbar-none::-webkit-scrollbar { display: none; }
 
 /* ── Page flow: the glue that stops sections feeling detached ──────────────────
- * .rt-seam replaces the hard border between sections with a hairline that fades out at both ends,
+ * .replaces the hard border between sections with a hairline that fades out at both ends,
  * .rt-tint replaces flat alternate-surface bands with a band that fades in and out vertically.
  * The original design (animationStyle "none") keeps its plain border and flat tint. */
-.rt-seam { position: relative; border-top: 1px solid var(--hairline); }
+.{ position: relative; border-top: 1px solid var(--hairline); }
 .rt-tint { background-color: color-mix(in oklab, var(--bg-alt) 45%, transparent); }
-[data-anim]:not([data-anim="none"]) .rt-seam { border-top-color: transparent; }
+[data-anim]:not([data-anim="none"]) .{ border-top-color: transparent; }
 [data-anim]:not([data-anim="none"]) .rt-seam::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; pointer-events: none;
   background: linear-gradient(90deg, transparent, var(--hairline-strong) 22%, var(--hairline-strong) 78%, transparent); }
 [data-anim]:not([data-anim="none"]) .rt-tint { background-color: transparent;

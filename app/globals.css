@@ -637,3 +637,133 @@ noscript .fg-draw {
 [data-type="light"] .rt-h { font-weight: 500; letter-spacing: -0.01em; }
 [data-type="tight"] .rt-h { font-weight: 700; letter-spacing: -0.045em; line-height: 1.05; }
 [data-type="airy"] .rt-h { font-weight: 600; letter-spacing: 0.005em; line-height: 1.2; }
+
+/* ── Landing FX: backgrounds, animated borders, interactive surfaces ────────────
+ * Dependency-free effects in the spirit of React Bits (Aurora, Beams, Squares, DotGrid, Retro Grid,
+ * StarBorder, SpotlightCard, TiltedCard, ShinyText). They only use the page's own tokens
+ * (--accent, --accent-2, --ink, --bg ...) so every effect picks up the partner's brand colour and
+ * the light/dark mode, and they all fade out at their edges so sections flow into each other.
+ * Gated behind [data-anim]:not([data-anim="none"]) where they would change the original design. */
+.rt-fx { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.rt-fx-fixed { position: fixed; }
+.rt-fx[data-fade="b"] { -webkit-mask-image: linear-gradient(to bottom, #000 56%, transparent); mask-image: linear-gradient(to bottom, #000 56%, transparent); }
+.rt-fx[data-fade="t"] { -webkit-mask-image: linear-gradient(to top, #000 56%, transparent); mask-image: linear-gradient(to top, #000 56%, transparent); }
+.rt-fx[data-fade="y"] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 68%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 68%, transparent); }
+
+/* Aurora */
+.rt-aurora { position: absolute; inset: -25% -10%; filter: blur(72px) saturate(1.25); opacity: 0.5; }
+.dark .rt-aurora { opacity: 0.4; }
+.rt-aurora[data-soft="true"] { opacity: 0.26; }
+.dark .rt-aurora[data-soft="true"] { opacity: 0.2; }
+.rt-aurora i { position: absolute; border-radius: 9999px; will-change: transform; }
+.rt-aurora i:nth-child(1) { left: 2%; top: 6%; width: 48%; height: 62%; background: radial-gradient(closest-side, var(--accent), transparent 72%); animation: rt-aur-a 18s ease-in-out infinite alternate; }
+.rt-aurora i:nth-child(2) { right: 0; top: 0; width: 44%; height: 58%; background: radial-gradient(closest-side, var(--accent-2), transparent 72%); animation: rt-aur-b 22s ease-in-out infinite alternate; }
+.rt-aurora i:nth-child(3) { left: 28%; bottom: -6%; width: 46%; height: 54%; background: radial-gradient(closest-side, color-mix(in oklab, var(--accent) 55%, var(--accent-2)), transparent 72%); animation: rt-aur-c 26s ease-in-out infinite alternate; }
+@keyframes rt-aur-a { to { transform: translate3d(14%, 10%, 0) scale(1.15); } }
+@keyframes rt-aur-b { to { transform: translate3d(-12%, 14%, 0) scale(0.9); } }
+@keyframes rt-aur-c { to { transform: translate3d(10%, -12%, 0) scale(1.12); } }
+
+/* Beams */
+.rt-beams::before { content: ""; position: absolute; left: 10%; right: 10%; top: -30%; height: 70%; background: radial-gradient(50% 100% at 50% 0%, color-mix(in oklab, var(--accent) 24%, transparent), transparent 75%); }
+.rt-beams b { position: absolute; top: -30%; left: var(--x); width: var(--w, 2px); height: 160%; transform: rotate(var(--r, 18deg)); transform-origin: top; opacity: 0; filter: blur(var(--bl, 0.6px));
+  background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--accent) 85%, transparent) 42%, color-mix(in oklab, var(--accent-2) 70%, transparent) 62%, transparent);
+  animation: rt-beam var(--dur, 9s) ease-in-out var(--dl, 0s) infinite; }
+@keyframes rt-beam { 0%, 100% { opacity: 0; translate: -3% 0; } 50% { opacity: 0.6; translate: 3% 0; } }
+
+/* Dot grid (with a cursor-reveal layer) */
+.rt-dots { position: absolute; inset: 0; background-image: radial-gradient(color-mix(in oklab, var(--ink) 26%, transparent) 1.1px, transparent 1.7px); background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(75% 70% at 50% 25%, #000 10%, transparent 82%); mask-image: radial-gradient(75% 70% at 50% 25%, #000 10%, transparent 82%); }
+.rt-dots-hot { position: absolute; inset: 0; background-image: radial-gradient(var(--accent) 1.7px, transparent 2.3px); background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(200px circle at var(--mx, 50%) var(--my, 28%), #000, transparent 70%); mask-image: radial-gradient(200px circle at var(--mx, 50%) var(--my, 28%), #000, transparent 70%); }
+
+/* Squares: a quiet grid with a few cells that breathe */
+.rt-squares { position: absolute; inset: 0; --sq: color-mix(in oklab, var(--ink) 12%, transparent); background-image: linear-gradient(var(--sq) 1px, transparent 1px), linear-gradient(90deg, var(--sq) 1px, transparent 1px); background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(80% 80% at 50% 20%, #000 10%, transparent 85%); mask-image: radial-gradient(80% 80% at 50% 20%, #000 10%, transparent 85%); }
+.rt-squares i { position: absolute; width: 52px; height: 52px; left: calc(var(--c) * 52px); top: calc(var(--r) * 52px); background: color-mix(in oklab, var(--accent) 16%, transparent); opacity: 0; animation: rt-sqpulse 6s ease-in-out infinite; animation-delay: var(--dl, 0s); }
+@keyframes rt-sqpulse { 0%, 100% { opacity: 0; } 45%, 55% { opacity: 1; } }
+
+/* Retro grid: a perspective floor receding to a glowing horizon */
+.rt-retro { position: absolute; inset: 0; perspective: 360px; overflow: hidden; }
+.rt-retro::after { content: ""; position: absolute; left: 0; right: 0; top: 40%; height: 34%; background: radial-gradient(55% 100% at 50% 0%, color-mix(in oklab, var(--accent) 34%, transparent), transparent 80%); }
+.rt-retro-plane { position: absolute; left: -80%; right: -80%; top: 42%; height: 170%; transform-origin: 50% 0; transform: rotateX(68deg); --g: color-mix(in oklab, var(--accent) 48%, transparent);
+  background-image: linear-gradient(to right, var(--g) 1px, transparent 1px), linear-gradient(to bottom, var(--g) 1px, transparent 1px); background-size: 64px 64px; animation: rt-retro 2.4s linear infinite;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 38%); mask-image: linear-gradient(to bottom, transparent 0, #000 38%); }
+@keyframes rt-retro { to { background-position: 0 64px; } }
+
+/* Market chart drifting sideways (trading flavoured background) */
+.rt-chart { position: absolute; inset: 0; }
+.rt-chart-track { display: flex; width: 200%; height: 100%; animation: rt-chart 70s linear infinite; }
+.rt-chart-track > svg { width: 50%; height: 100%; flex: none; }
+@keyframes rt-chart { to { transform: translateX(-50%); } }
+
+/* Orb + rings */
+.rt-orb { position: absolute; pointer-events: none; border-radius: 9999px; opacity: 0.85; animation: rt-orb 14s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--accent) 35%, #fff) 0, var(--accent) 36%, var(--accent-2) 76%, transparent 78%);
+  box-shadow: 0 0 140px 20px color-mix(in oklab, var(--accent) 36%, transparent); }
+@keyframes rt-orb { to { transform: translate3d(0, -18px, 0) scale(1.05); } }
+.rt-rings i { position: absolute; left: 50%; top: 50%; width: var(--s, 900px); height: var(--s, 900px); margin: calc(var(--s, 900px) / -2) 0 0 calc(var(--s, 900px) / -2); border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--accent) 40%, transparent); opacity: 0; animation: rt-ring 10s ease-out infinite; animation-delay: calc(var(--k) * -2s); }
+@keyframes rt-ring { 0% { transform: scale(0.2); opacity: 0; } 15% { opacity: 0.8; } 100% { transform: scale(1.1); opacity: 0; } }
+
+/* Film grain */
+.rt-noise { position: absolute; inset: 0; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.dark .rt-noise { opacity: 0.1; }
+
+/* Static mesh */
+.rt-mesh { position: absolute; inset: 0;
+  background: radial-gradient(60% 46% at 12% 0%, color-mix(in oklab, var(--accent) 20%, transparent), transparent 70%), radial-gradient(52% 40% at 92% 8%, color-mix(in oklab, var(--accent-2) 18%, transparent), transparent 70%), radial-gradient(64% 46% at 50% 100%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 72%); }
+
+/* StarBorder: a bright comet orbiting the border */
+@property --rt-ang { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.rt-star { position: relative; isolation: isolate; padding: 1.5px; animation: rt-spin 6s linear infinite;
+  background: conic-gradient(from var(--rt-ang), color-mix(in oklab, var(--accent) 16%, transparent) 0, transparent 30%, transparent 55%, var(--accent) 78%, var(--accent-2) 92%, color-mix(in oklab, var(--accent) 16%, transparent) 100%); }
+.rt-star::before { content: ""; position: absolute; inset: -4px; z-index: -1; border-radius: inherit; background: inherit; filter: blur(16px); opacity: 0.3; }
+.rt-star-in { border-radius: inherit; background: var(--card); height: 100%; }
+@keyframes rt-spin { to { --rt-ang: 360deg; } }
+
+/* SpotlightCard / TiltCard / ShinyText */
+.rt-spot { position: relative; isolation: isolate; }
+.rt-spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--accent) 16%, transparent), transparent 65%); }
+.rt-spot:hover::before { opacity: 1; }
+.rt-tilt { transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.2s ease-out; will-change: transform; }
+.rt-shiny { display: inline-block; color: transparent; -webkit-background-clip: text; background-clip: text; background-size: 220% 100%; animation: rt-shiny 3.6s linear infinite;
+  background-image: linear-gradient(110deg, color-mix(in oklab, var(--ink) 55%, transparent) 40%, var(--ink) 50%, color-mix(in oklab, var(--ink) 55%, transparent) 60%); }
+@keyframes rt-shiny { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* Small helpers used by the new layouts */
+.rt-outline-text { color: transparent; -webkit-text-stroke: 1.5px color-mix(in oklab, var(--accent) 55%, transparent); }
+.rt-dash { stroke-dasharray: 6 8; animation: rt-dash 1.2s linear infinite; }
+@keyframes rt-dash { to { stroke-dashoffset: -28; } }
+.rt-scrollbar-none { scrollbar-width: none; }
+.rt-scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ── Page flow: the glue that stops sections feeling detached ──────────────────
+ * .rt-seam replaces the hard border between sections with a hairline that fades out at both ends,
+ * .rt-tint replaces flat alternate-surface bands with a band that fades in and out vertically.
+ * The original design (animationStyle "none") keeps its plain border and flat tint. */
+.rt-seam { position: relative; border-top: 1px solid var(--hairline); }
+.rt-tint { background-color: color-mix(in oklab, var(--bg-alt) 45%, transparent); }
+[data-anim]:not([data-anim="none"]) .rt-seam { border-top-color: transparent; }
+[data-anim]:not([data-anim="none"]) .rt-seam::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--hairline-strong) 22%, var(--hairline-strong) 78%, transparent); }
+[data-anim]:not([data-anim="none"]) .rt-tint { background-color: transparent;
+  background-image: linear-gradient(to bottom, transparent 0, color-mix(in oklab, var(--bg-alt) 88%, transparent) 16%, color-mix(in oklab, var(--bg-alt) 88%, transparent) 84%, transparent 100%); }
+
+/* Page backdrops (themeConfig.backdrop): one fixed atmosphere under every section */
+.rt-bd-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--ink-grid) 1px, transparent 1px), linear-gradient(90deg, var(--ink-grid) 1px, transparent 1px); background-size: 56px 56px; opacity: 0.35;
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 22%, #000, transparent 85%); mask-image: radial-gradient(80% 70% at 50% 22%, #000, transparent 85%); }
+
+/* Card surfaces (themeConfig.surface): restyle every .bg-card on the page in one place */
+[data-surface="glass"] .bg-card:not(#rt-mobile-menu):not([data-solid]) { background-color: color-mix(in oklab, var(--card) 64%, transparent); -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); }
+[data-surface="glow"] .bg-card:not(#rt-mobile-menu):not([data-solid]) { box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 24%, var(--hairline)), 0 20px 56px -26px color-mix(in oklab, var(--accent) 46%, transparent); }
+[data-surface="outline"] .bg-card:not(#rt-mobile-menu):not([data-solid]) { background-color: transparent; border-color: var(--hairline-strong); box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rt-aurora i, .rt-beams b, .rt-squares i, .rt-retro-plane, .rt-chart-track, .rt-orb, .rt-rings i, .rt-star, .rt-shiny, .rt-dash { animation: none !important; }
+  .rt-beams b { opacity: 0.35; }
+  .rt-rings i { opacity: 0.35; transform: scale(0.6); }
+  .rt-shiny { color: var(--ink); background-image: none; }
+  .rt-tilt { transform: none !important; }
+}

@@ -32,7 +32,7 @@ function Byline({ t }: { t: Item }) {
 /** Variant 1: card grid. */
 export function Testimonials1({ content, ctx }: TestimonialsProps) {
   return (
-    <Section id="reviews" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="reviews" className="rt-tint py-16 lg:py-24">
       <Container>
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -98,7 +98,7 @@ export function Testimonials2({ content, ctx }: TestimonialsProps) {
 /** Variant 3: heading on the left, quotes stacked with an accent rule on the right. */
 export function Testimonials3({ content, ctx }: TestimonialsProps) {
   return (
-    <Section id="reviews" className="bg-bg-alt/30 py-16 lg:py-24">
+    <Section id="reviews" className="rt-tint py-16 lg:py-24">
       <Container>
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-4">

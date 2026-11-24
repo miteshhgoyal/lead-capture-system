@@ -19,7 +19,7 @@ function MentorLogo({ ctx, className }: { ctx: PageContext; className: string })
 /** Variant 1: the original profile card (identity left, bio right). */
 export function Mentor1({ content, ctx }: MentorProps) {
   return (
-    <Section id="mentor" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="mentor" className="rt-tint py-16 lg:py-24">
       <Container>
         <Reveal className="overflow-hidden rounded-3xl border border-hairline bg-card shadow-lg">
           <div className="grid grid-cols-1 items-center gap-8 p-8 sm:p-12 lg:grid-cols-12 lg:gap-12">
@@ -67,7 +67,7 @@ export function Mentor2({ content, ctx }: MentorProps) {
 /** Variant 3: split card with a brand-coloured identity panel. */
 export function Mentor3({ content, ctx }: MentorProps) {
   return (
-    <Section id="mentor" className="bg-bg-alt/30 py-16 lg:py-24">
+    <Section id="mentor" className="rt-tint py-16 lg:py-24">
       <Container size="lg">
         <Reveal className="grid overflow-hidden rounded-3xl border border-hairline bg-card shadow-lg md:grid-cols-5">
           <div className="flex flex-col items-center justify-center bg-gradient-to-br from-accent to-accent-2 p-8 text-center text-accent-ink md:col-span-2">

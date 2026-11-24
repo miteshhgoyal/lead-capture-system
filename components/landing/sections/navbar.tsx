@@ -8,7 +8,7 @@ import type { SectionProps } from "./types";
 
 type NavProps = SectionProps<"navbar">;
 
-function NavLinks({ ctx, className, onNavigate }: { ctx: NavProps["ctx"]; className: string; onNavigate?: () => void }) {
+export function NavLinks({ ctx, className, onNavigate }: { ctx: NavProps["ctx"]; className: string; onNavigate?: () => void }) {
   return (
     <>
       {ctx.navLinks.map((l) => (

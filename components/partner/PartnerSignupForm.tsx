@@ -118,7 +118,7 @@ export function PartnerSignupForm() {
   const ink = getReadableTextColor(primaryColor);
 
   return (
-    <div id="lead-form" className="scroll-mt-24 rounded-3xl border border-hairline bg-card p-6 shadow-xl sm:p-7">
+    <div id="lead-form" data-solid className="scroll-mt-24 rounded-3xl border border-hairline bg-card p-6 shadow-xl sm:p-7">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-ink">Become a partner</h2>

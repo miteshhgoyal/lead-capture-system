@@ -33,7 +33,7 @@ export function Section({
   deferred?: boolean;
 }) {
   return (
-    <section id={id} className={`${deferred ? "rt-defer " : ""}scroll-mt-20 border-t border-hairline ${className}`.trim()}>
+    <section id={id} className={`${deferred ? "rt-defer " : ""}scroll-mt-20 rt-seam ${className}`.trim()}>
       {children}
     </section>
   );
@@ -128,7 +128,7 @@ export function BrandLogo({ ctx, className = "h-9" }: { ctx: Pick<PageContext, "
 export function HeroForm({ ctx }: { ctx: PageContext }) {
   if (ctx.preview) {
     return (
-      <div id="lead-form" className="scroll-mt-24 rounded-3xl border border-dashed border-hairline-strong bg-card p-8 text-center text-sm text-mute">
+      <div id="lead-form" data-solid className="scroll-mt-24 rounded-3xl border border-dashed border-hairline-strong bg-card p-8 text-center text-sm text-mute">
         Lead form (disabled in preview)
       </div>
     );

@@ -7,14 +7,19 @@ import { CONTENT_POOLS } from "@/lib/page-builder/pools";
 import { buildThemeVars, BUTTON_STYLES, LEGACY_THEME, PALETTES, RADII, TYPE_STYLES } from "@/lib/page-builder/theme";
 import {
   ANIMATION_STYLES,
+  BACKDROPS,
   SECTION_KEYS,
+  SURFACES,
   variantIds,
   type AnimationStyle,
+  type Backdrop,
   type ButtonStyle,
   type RadiusStyle,
   type SectionKey,
+  type Surface,
   type TypeStyle,
 } from "@/lib/page-builder/types";
+import { PageBackdrop } from "../fx/PageBackdrop";
 import { AnimationProvider, getAnimationPreset } from "../motion";
 import { resolvePage, type PagePlan } from "../page-context";
 import { RenderSection } from "../registry";
@@ -52,6 +57,8 @@ export function LayoutsPreview() {
   const [button, setButton] = useState<ButtonStyle>("solid");
   const [type, setType] = useState<TypeStyle>("classic");
   const [palette, setPalette] = useState<string>(PALETTES[0].id);
+  const [backdrop, setBackdrop] = useState<Backdrop>("blobs");
+  const [surface, setSurface] = useState<Surface>("solid");
   const [contentIndex, setContentIndex] = useState(1);
 
   const maxContent = Math.max(...SECTION_KEYS.map((k) => CONTENT_POOLS[k].length));
@@ -60,7 +67,7 @@ export function LayoutsPreview() {
     const plan: PagePlan = {
       layoutConfig: Object.fromEntries(SECTION_KEYS.map((k) => [k, `${k}_1`])) as PagePlan["layoutConfig"],
       contentConfig: buildContent((key) => Math.min(contentIndex - 1, CONTENT_POOLS[key].length - 1)),
-      themeConfig: { ...LEGACY_THEME, paletteId: palette, radius, buttonStyle: button, typeStyle: type, animationStyle: animation },
+      themeConfig: { ...LEGACY_THEME, paletteId: palette, radius, buttonStyle: button, typeStyle: type, animationStyle: animation, backdrop, surface },
       sectionOrder: [...LEGACY_SECTION_ORDER, "testimonials", "offer"],
     };
     return resolvePage({
@@ -70,7 +77,7 @@ export function LayoutsPreview() {
       plan,
       preview: true,
     });
-  }, [color, animation, radius, button, type, palette, contentIndex]);
+  }, [color, animation, radius, button, type, palette, backdrop, surface, contentIndex]);
 
   const preset = getAnimationPreset(animation);
 
@@ -91,6 +98,8 @@ export function LayoutsPreview() {
           <Select label="Buttons" value={button} options={BUTTON_STYLES} onChange={setButton} />
           <Select label="Type (Inter)" value={type} options={TYPE_STYLES} onChange={setType} />
           <Select label="Animation" value={animation} options={ANIMATION_STYLES} onChange={setAnimation} />
+          <Select label="Backdrop" value={backdrop} options={BACKDROPS} onChange={setBackdrop} />
+          <Select label="Card surface" value={surface} options={SURFACES} onChange={setSurface} />
           <label className="flex flex-col gap-1 text-[11px] font-semibold text-mute">
             Content set #{contentIndex}
             <input type="range" min={1} max={maxContent} value={contentIndex} onChange={(e) => setContentIndex(Number(e.target.value))} />
@@ -125,9 +134,13 @@ export function LayoutsPreview() {
                     data-type={type}
                     data-anim={preset.style}
                     data-lift={String(preset.hoverLift)}
+                    data-surface={surface}
                   >
+                    <PageBackdrop kind={backdrop} fixed={false} />
                     <AnimationProvider style={animation}>
-                      <RenderSection name={section} variantId={id} content={content[section]} ctx={ctx} />
+                      <div className="relative z-10">
+                        <RenderSection name={section} variantId={id} content={content[section]} ctx={ctx} />
+                      </div>
                     </AnimationProvider>
                   </div>
                 </figure>

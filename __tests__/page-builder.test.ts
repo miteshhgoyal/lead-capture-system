@@ -4,9 +4,9 @@ import { generatePartnerPage, LEGACY_SECTION_ORDER, pickSectionOrder } from "../
 import { mulberry32 } from "../lib/page-builder/prng";
 import { CONTENT_POOLS } from "../lib/page-builder/pools";
 import { fillPlaceholders, findPlaceholders, PLACEHOLDER_KEYS, resolveMeta, resolveSectionContent, type PlaceholderVars } from "../lib/page-builder/resolve";
-import { buildThemeVars, LEGACY_THEME, PALETTES, TYPE_STYLES } from "../lib/page-builder/theme";
+import { buildThemeVars, LEGACY_THEME, PALETTES, RANDOM_BACKDROPS, RANDOM_SURFACES, TYPE_STYLES } from "../lib/page-builder/theme";
 import { hasPageConfig } from "../lib/page-builder/validate";
-import { ICON_KEYS, SECTION_KEYS, VARIANT_COUNTS, variantIds, type SectionContentMap, type SectionKey } from "../lib/page-builder/types";
+import { BACKDROPS, ICON_KEYS, SECTION_KEYS, SURFACES, VARIANT_COUNTS, variantIds, type SectionContentMap, type SectionKey } from "../lib/page-builder/types";
 import { SECTION_VARIANTS } from "../components/landing/registry";
 import { ICON_MAP } from "../components/ui/icons";
 
@@ -65,6 +65,22 @@ describe("generatePartnerPage", () => {
     assert.ok(new Set(pages.map((p) => p.contentConfig.faq.id)).size >= 3);
   });
 
+  it("every generated page gets a valid backdrop and card surface, with variety", () => {
+    for (const { themeConfig } of pages) {
+      assert.ok(BACKDROPS.includes(themeConfig.backdrop!), String(themeConfig.backdrop));
+      assert.ok(SURFACES.includes(themeConfig.surface!), String(themeConfig.surface));
+    }
+    assert.ok(new Set(pages.map((p) => p.themeConfig.backdrop)).size >= 5, "backdrops barely vary");
+    assert.ok(new Set(pages.map((p) => p.themeConfig.surface)).size >= 3, "surfaces barely vary");
+    assert.ok(RANDOM_BACKDROPS.length >= 6 && RANDOM_SURFACES.length >= 4);
+  });
+
+  it("uses every one of the 12 hero layouts across a larger sample", () => {
+    const used = new Set<string>();
+    for (let seed = 1; seed <= 400; seed++) used.add(generatePartnerPage({}, { seed }).layoutConfig.hero);
+    assert.equal(used.size, VARIANT_COUNTS.hero);
+  });
+
   it("gives each partner its own stat figures, saved in the content config", () => {
     const first = pages.map((p) => p.contentConfig.stats.items[0].end);
     assert.ok(new Set(first).size >= 40, "student counts barely vary");
@@ -117,6 +133,8 @@ describe("generatePartnerPage", () => {
     assert.deepEqual(legacy.sectionOrder, LEGACY_SECTION_ORDER);
     assert.deepEqual(legacy.themeConfig, LEGACY_THEME);
     assert.equal(legacy.themeConfig.animationStyle, "none");
+    assert.equal(legacy.themeConfig.backdrop, "blobs");
+    assert.equal(legacy.themeConfig.surface, "solid");
   });
 });
 
@@ -127,21 +145,22 @@ describe("registry and pools", () => {
     }
   });
 
-  it("meets the required variant counts", () => {
-    assert.deepEqual(
-      { navbar: 3, hero: 4, features: 4, steps: 3, testimonials: 3, offer: 3, faq: 3, cta: 3, footer: 3 },
-      {
-        navbar: VARIANT_COUNTS.navbar,
-        hero: VARIANT_COUNTS.hero,
-        features: VARIANT_COUNTS.features,
-        steps: VARIANT_COUNTS.steps,
-        testimonials: VARIANT_COUNTS.testimonials,
-        offer: VARIANT_COUNTS.offer,
-        faq: VARIANT_COUNTS.faq,
-        cta: VARIANT_COUNTS.cta,
-        footer: VARIANT_COUNTS.footer,
-      }
-    );
+  it("ships at least three times the original number of layouts (35 -> 105)", () => {
+    const ORIGINAL = { navbar: 3, hero: 4, features: 4, steps: 3, mentor: 3, stats: 3, testimonials: 3, offer: 3, faq: 3, cta: 3, footer: 3 };
+    let total = 0;
+    for (const section of SECTION_KEYS) {
+      assert.ok(VARIANT_COUNTS[section] >= ORIGINAL[section] * 3, `${section}: ${VARIANT_COUNTS[section]} variants`);
+      total += VARIANT_COUNTS[section];
+    }
+    assert.ok(total >= 105, `only ${total} layouts`);
+  });
+
+  it("keeps the original variant ids valid so saved pages still render", () => {
+    for (const section of SECTION_KEYS) {
+      for (let n = 1; n <= 3; n++) assert.ok(`${section}_${n}` in SECTION_VARIANTS[section]);
+    }
+    assert.ok("hero_4" in SECTION_VARIANTS.hero);
+    assert.ok("features_4" in SECTION_VARIANTS.features);
   });
 
   it("meets the required content pool sizes", () => {

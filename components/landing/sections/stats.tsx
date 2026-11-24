@@ -1,24 +1,12 @@
 "use client";
 
-import type { StatItem } from "@/lib/page-builder/types";
 import { Marquee } from "../motion/Extras";
 import { Reveal } from "../motion/Reveal";
-import { CountUp } from "../TradingVisuals";
+import { StatValue, staticValue } from "./kit";
 import { Container, Section } from "./ui";
 import type { SectionProps } from "./types";
 
 type StatsProps = SectionProps<"stats">;
-
-function StatValue({ item }: { item: StatItem }) {
-  if (item.end === undefined) return <>{item.text ?? ""}</>;
-  return <CountUp end={item.end} decimals={item.decimals} suffix={item.suffix} />;
-}
-
-function staticValue(item: StatItem): string {
-  if (item.end === undefined) return item.text ?? "";
-  const n = item.end.toLocaleString("en-US", { minimumFractionDigits: item.decimals ?? 0, maximumFractionDigits: item.decimals ?? 0 });
-  return `${n}${item.suffix ?? ""}`;
-}
 
 /** Variant 1: the original four stat tiles. */
 export function Stats1({ content }: StatsProps) {

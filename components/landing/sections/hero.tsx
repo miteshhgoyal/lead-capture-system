@@ -11,7 +11,7 @@ import type { HeroHighlight } from "@/lib/page-builder/types";
 
 type HeroProps = SectionProps<"hero">;
 
-function TrustBadge({ text }: { text: string }) {
+export function TrustBadge({ text }: { text: string }) {
   return (
     <div className="inline-flex items-center gap-2 rounded-full border border-hairline bg-card/60 px-3.5 py-1.5 text-xs font-semibold backdrop-blur-sm">
       <span className="flex size-2 animate-pulse rounded-full bg-up" />
@@ -38,7 +38,7 @@ function HighlightCard({ item, index }: { item: HeroHighlight; index: number }) 
   );
 }
 
-function MobileJump({ label }: { label: string }) {
+export function MobileJump({ label }: { label: string }) {
   return (
     <div className="mt-8 block lg:hidden">
       <CtaButton className="w-full py-3.5 text-center">
@@ -48,7 +48,7 @@ function MobileJump({ label }: { label: string }) {
   );
 }
 
-const H1 = "rt-h mt-5 text-3xl font-extrabold tracking-tight text-ink sm:text-5xl";
+export const H1 = "rt-h mt-5 text-3xl font-extrabold tracking-tight text-ink sm:text-5xl";
 
 /** Variant 1: the original split hero (copy left, sticky form right). */
 export function Hero1({ content, ctx }: HeroProps) {

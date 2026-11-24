@@ -6,6 +6,7 @@ import { generatePartnerPage } from "@/lib/page-builder/generate";
 import type { SectionKey } from "@/lib/page-builder/types";
 import { AnimationProvider, useAnimationPreset } from "./motion";
 import { resolvePage, type PagePlan, type PartnerView } from "./page-context";
+import { PageBackdrop } from "./fx/PageBackdrop";
 import { RenderSection } from "./registry";
 
 interface LandingPageProps {
@@ -39,13 +40,10 @@ function PageBody({ page, plan, formMode }: { page: ReturnType<typeof resolvePag
       data-type={plan.themeConfig.typeStyle}
       data-anim={preset.style}
       data-lift={String(preset.hoverLift)}
+      data-surface={plan.themeConfig.surface ?? "solid"}
     >
-      {/* Background glow blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="f-blob a" />
-        <div className="f-blob b" />
-        <div className="f-blob c" />
-      </div>
+      {/* One shared atmosphere under every section (themeConfig.backdrop; "blobs" = the original glow) */}
+      <PageBackdrop kind={plan.themeConfig.backdrop} />
 
       {formMode === "partner" && (
         <div className="relative z-20 border-b border-hairline bg-card/80 px-4 py-2 text-center text-xs text-mute backdrop-blur">
@@ -57,7 +55,8 @@ function PageBody({ page, plan, formMode }: { page: ReturnType<typeof resolvePag
       )}
       {order.filter((k) => k === "navbar").map(render)}
       <main className="relative z-10">{order.filter((k) => k !== "navbar" && k !== "footer").map(render)}</main>
-      {order.filter((k) => k === "footer").map(render)}
+      {/* Same stacking as <main>, so the fixed backdrop never paints over the footer */}
+      <div className="relative z-10">{order.filter((k) => k === "footer").map(render)}</div>
     </div>
   );
 }

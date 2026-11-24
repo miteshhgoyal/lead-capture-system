@@ -137,6 +137,7 @@ export function LeadForm({
     return (
       <div
         id="lead-form"
+        data-solid
         className={`relative scroll-mt-24 overflow-hidden rounded-3xl border border-hairline bg-card p-5 shadow-2xl transition-all sm:p-8 ${className}`}
       >
         <Confetti />
@@ -233,6 +234,7 @@ export function LeadForm({
   return (
     <div
       id="lead-form"
+      data-solid
       className={`relative scroll-mt-24 rounded-3xl border border-hairline bg-card p-5 shadow-2xl transition-all sm:p-8 ${className}`}
     >
       {/* Decorative accent wash (clipped so it can never cause sideways scroll) */}

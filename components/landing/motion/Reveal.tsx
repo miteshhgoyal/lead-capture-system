@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ElementType, ReactNode } from "react";
+import type { CSSProperties, ElementType, PointerEvent, ReactNode } from "react";
 import { useAnimationPreset } from "./context";
 import { useRevealState, usePrefersReducedMotion } from "./hooks";
 
@@ -17,10 +17,12 @@ interface RevealProps {
   /** Above-the-fold content: animate on first paint instead of on scroll. */
   eager?: boolean;
   id?: string;
+  /** Adds the pointer-following spotlight glow (SpotlightCard effect) to this element. */
+  spot?: boolean;
 }
 
 /** Scroll-triggered fade / slide / blur reveal chosen by the page's animation preset. */
-export function Reveal({ children, as, className = "", index = 0, delay = 0, eager = false, id }: RevealProps) {
+export function Reveal({ children, as, className = "", index = 0, delay = 0, eager = false, id, spot = false }: RevealProps) {
   const Tag: ElementType = as ?? "div";
   const preset = useAnimationPreset();
   const reduced = usePrefersReducedMotion();
@@ -36,8 +38,17 @@ export function Reveal({ children, as, className = "", index = 0, delay = 0, eag
     "--rt-delay": `${delay + index * preset.stagger}ms`,
   };
 
+  const onPointerMove = spot
+    ? (e: PointerEvent<HTMLElement>) => {
+        const el = e.currentTarget;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        el.style.setProperty("--my", `${e.clientY - r.top}px`);
+      }
+    : undefined;
+
   return (
-    <Tag ref={ref} id={id} className={`${cls} ${className}`.trim()} style={enabled ? style : undefined}>
+    <Tag ref={ref} id={id} onPointerMove={onPointerMove} className={`${spot ? "rt-spot " : ""}${cls} ${className}`.trim()} style={enabled ? style : undefined}>
       {children}
     </Tag>
   );

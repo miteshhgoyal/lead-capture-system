@@ -4,21 +4,46 @@ import { createElement, type ComponentType } from "react";
 import { renderToString } from "react-dom/server";
 import { AnimationProvider } from "../components/landing/motion";
 import * as navbar from "../components/landing/sections/navbar";
+import * as navbarMore from "../components/landing/sections/navbar-more";
 import * as hero from "../components/landing/sections/hero";
+import * as heroMore from "../components/landing/sections/hero-more";
 import * as features from "../components/landing/sections/features";
+import * as featuresMore from "../components/landing/sections/features-more";
 import * as steps from "../components/landing/sections/steps";
+import * as stepsMore from "../components/landing/sections/steps-more";
 import * as mentor from "../components/landing/sections/mentor";
+import * as mentorMore from "../components/landing/sections/mentor-more";
 import * as stats from "../components/landing/sections/stats";
+import * as statsMore from "../components/landing/sections/stats-more";
 import * as testimonials from "../components/landing/sections/testimonials";
+import * as testimonialsMore from "../components/landing/sections/testimonials-more";
 import * as offer from "../components/landing/sections/offer";
+import * as offerMore from "../components/landing/sections/offer-more";
 import * as faq from "../components/landing/sections/faq";
+import * as faqMore from "../components/landing/sections/faq-more";
 import * as cta from "../components/landing/sections/cta";
+import * as ctaMore from "../components/landing/sections/cta-more";
 import * as footer from "../components/landing/sections/footer";
+import * as footerMore from "../components/landing/sections/footer-more";
 import type { PageContext } from "../components/landing/sections/types";
 import { CONTENT_POOLS } from "../lib/page-builder/pools";
-import { ANIMATION_STYLES, VARIANT_COUNTS, type SectionKey } from "../lib/page-builder/types";
+import { PageBackdrop } from "../components/landing/fx/PageBackdrop";
+import { ANIMATION_STYLES, BACKDROPS, VARIANT_COUNTS, type SectionKey } from "../lib/page-builder/types";
 
-const MODULES: Record<SectionKey, Record<string, unknown>> = { navbar, hero, features, steps, mentor, stats, testimonials, offer, faq, cta, footer };
+/** Original variants live in <section>.tsx, later additions in <section>-more.tsx. */
+const MODULES: Record<SectionKey, Record<string, unknown>> = {
+  navbar: { ...navbar, ...navbarMore },
+  hero: { ...hero, ...heroMore },
+  features: { ...features, ...featuresMore },
+  steps: { ...steps, ...stepsMore },
+  mentor: { ...mentor, ...mentorMore },
+  stats: { ...stats, ...statsMore },
+  testimonials: { ...testimonials, ...testimonialsMore },
+  offer: { ...offer, ...offerMore },
+  faq: { ...faq, ...faqMore },
+  cta: { ...cta, ...ctaMore },
+  footer: { ...footer, ...footerMore },
+};
 
 const ctx: PageContext = {
   brandName: "Test Brand",
@@ -59,4 +84,18 @@ describe("section variants render", () => {
       });
     }
   }
+});
+
+describe("page backdrops", () => {
+  for (const kind of BACKDROPS) {
+    it(`PageBackdrop renders "${kind}"`, () => {
+      const html = renderToString(createElement(PageBackdrop, { kind }));
+      assert.ok(html.length > 20);
+      assert.ok(!html.includes("undefined"));
+    });
+  }
+
+  it("falls back to the original blobs when a page has no backdrop", () => {
+    assert.equal(renderToString(createElement(PageBackdrop, {})), renderToString(createElement(PageBackdrop, { kind: "blobs" })));
+  });
 });

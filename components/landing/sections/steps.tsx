@@ -29,7 +29,7 @@ export function Steps1({ content }: StepsProps) {
 /** Variant 2: vertical timeline. */
 export function Steps2({ content }: StepsProps) {
   return (
-    <Section id="how" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="how" className="rt-tint py-16 lg:py-24">
       <Container size="md">
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
         <ol className="relative mt-12 space-y-10 border-l-2 border-accent/25 pl-8 sm:pl-10">

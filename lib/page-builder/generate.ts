@@ -1,6 +1,6 @@
 import { CONTENT_POOLS } from "./pools";
 import { mulberry32, pick, randomSeed, shuffle, type Rng } from "./prng";
-import { BUTTON_STYLES, LEGACY_THEME, PALETTES, RADII, RANDOM_ANIMATION_STYLES, TYPE_STYLES } from "./theme";
+import { BUTTON_STYLES, LEGACY_THEME, PALETTES, RADII, RANDOM_ANIMATION_STYLES, RANDOM_BACKDROPS, RANDOM_SURFACES, TYPE_STYLES } from "./theme";
 import {
   MIDDLE_SECTION_KEYS,
   SECTION_KEYS,
@@ -125,6 +125,8 @@ export function generatePartnerPage(partner: GenerateSubject = {}, options: Gene
   const sectionOrder = pickSectionOrder(rng, (partner.testimonials?.length ?? 0) > 0);
   // Drawn last so every other choice for a given seed is unchanged.
   contentConfig.stats = { ...contentConfig.stats, items: randomStats(rng) };
+  themeConfig.backdrop = pick(rng, RANDOM_BACKDROPS);
+  themeConfig.surface = pick(rng, RANDOM_SURFACES);
 
   return { seed, layoutConfig, contentConfig, themeConfig, sectionOrder };
 }

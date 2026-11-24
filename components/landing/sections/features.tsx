@@ -1,41 +1,13 @@
 "use client";
 
 import { Icon } from "@/components/ui/icons";
-import type { FeatureItem, FeatureVisual } from "@/lib/page-builder/types";
+import type { FeatureItem } from "@/lib/page-builder/types";
 import { Reveal } from "../motion/Reveal";
-import { AreaChartVisual, CandlestickVisual, RiskRewardVisual } from "../TradingVisuals";
+import { FeatureVisualBlock } from "./kit";
 import { Container, Section, SectionHeader } from "./ui";
 import type { SectionProps } from "./types";
 
 type FeaturesProps = SectionProps<"features">;
-
-function DisciplinePanel() {
-  return (
-    <div className="rounded-2xl border border-hairline bg-card p-4 sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-semibold text-mute">
-        <span>Trader Discipline Score</span>
-        <span className="font-bold text-up">94% Target Compliance</span>
-      </div>
-      <div className="mt-3 space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-x-3 text-xs">
-          <span className="text-mute">Zero Revenge Trades</span>
-          <span className="font-semibold text-ink">100% Enforced</span>
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-x-3 text-xs">
-          <span className="text-mute">Max Daily Loss Cutoff</span>
-          <span className="font-semibold text-ink">2% Total Capital</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FeatureVisualBlock({ visual }: { visual: FeatureVisual }) {
-  if (visual === "area") return <AreaChartVisual />;
-  if (visual === "risk") return <RiskRewardVisual />;
-  if (visual === "candles") return <CandlestickVisual />;
-  return <DisciplinePanel />;
-}
 
 function tone(i: number) {
   return i % 2 === 1 ? "bg-accent-2/15 text-accent" : "bg-accent/10 text-accent";
@@ -52,7 +24,7 @@ function IconTile({ item, index, className = "size-12 rounded-2xl" }: { item: Fe
 /** Variant 1: the original 2-column pillar cards, each with its illustration. */
 export function Features1({ content }: FeaturesProps) {
   return (
-    <Section id="learn" className="bg-bg-alt/50 py-16 lg:py-24">
+    <Section id="learn" className="rt-tint py-16 lg:py-24">
       <Container>
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -103,7 +75,7 @@ export function Features2({ content }: FeaturesProps) {
 /** Variant 3: sticky heading on the left, numbered rows on the right. */
 export function Features3({ content }: FeaturesProps) {
   return (
-    <Section id="learn" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="learn" className="rt-tint py-16 lg:py-24">
       <Container>
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">

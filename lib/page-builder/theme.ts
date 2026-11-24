@@ -1,5 +1,5 @@
 import { getLuminance, getReadableTextColor, hexToHsl, hslToHex } from "../theme-utils";
-import type { AnimationStyle, ButtonStyle, RadiusStyle, ThemeConfig, TypeStyle } from "./types";
+import type { AnimationStyle, Backdrop, ButtonStyle, RadiusStyle, Surface, ThemeConfig, TypeStyle } from "./types";
 
 /**
  * A palette recipe says how the gradient partner of the brand colour is derived from it.
@@ -42,12 +42,19 @@ export const TYPE_STYLES: readonly TypeStyle[] = ["classic", "bold", "light", "t
 /** "none" is reserved for legacy pages, the randomizer only picks real presets. */
 export const RANDOM_ANIMATION_STYLES: readonly AnimationStyle[] = ["soft-fade", "bold-slide", "typewriter", "blur-stagger"];
 
+/** Page backdrops the randomizer picks from. */
+export const RANDOM_BACKDROPS: readonly Backdrop[] = ["blobs", "aurora", "grid", "dots", "beams", "mesh", "noise"];
+/** Card surfaces the randomizer picks from: "solid" is listed twice so most pages keep plain cards. */
+export const RANDOM_SURFACES: readonly Surface[] = ["solid", "solid", "glass", "glow", "outline"];
+
 export const LEGACY_THEME: ThemeConfig = {
   paletteId: LEGACY_PALETTE.id,
   radius: "soft",
   buttonStyle: "solid",
   typeStyle: "classic",
   animationStyle: "none",
+  backdrop: "blobs",
+  surface: "solid",
 };
 
 const RADIUS_VALUES: Record<RadiusStyle, { xl: string; "2xl": string; "3xl": string }> = {

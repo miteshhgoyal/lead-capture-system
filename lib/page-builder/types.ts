@@ -32,19 +32,22 @@ export const MIDDLE_SECTION_KEYS = [
 ] as const satisfies readonly SectionKey[];
 export type MiddleSectionKey = (typeof MIDDLE_SECTION_KEYS)[number];
 
-/** How many layout variants each section ships with (variant 1 is the original design). */
+/**
+ * How many layout variants each section ships with. Variants 1..N-of-the-original-set are the first
+ * designs and stay exactly as they were (saved pages reference them by id); the rest were added later.
+ */
 export const VARIANT_COUNTS: Record<SectionKey, number> = {
-  navbar: 3,
-  hero: 4,
-  features: 4,
-  steps: 3,
-  mentor: 3,
-  stats: 3,
-  testimonials: 3,
-  offer: 3,
-  faq: 3,
-  cta: 3,
-  footer: 3,
+  navbar: 9,
+  hero: 12,
+  features: 12,
+  steps: 9,
+  mentor: 9,
+  stats: 9,
+  testimonials: 9,
+  offer: 9,
+  faq: 9,
+  cta: 9,
+  footer: 9,
 };
 
 export function variantId(section: SectionKey, n: number): string {
@@ -89,12 +92,22 @@ export type ButtonStyle = "solid" | "gradient" | "outline" | "pill";
 /** Inter is the only typeface; these presets change weight, tracking and case only. */
 export type TypeStyle = "classic" | "bold" | "light" | "tight" | "airy";
 
+/** The fixed atmosphere behind every section. Absent on pages saved before backdrops existed (= "blobs"). */
+export const BACKDROPS = ["blobs", "aurora", "grid", "dots", "beams", "mesh", "noise"] as const;
+export type Backdrop = (typeof BACKDROPS)[number];
+
+/** How cards look page-wide. Absent on older pages (= "solid"). */
+export const SURFACES = ["solid", "glass", "glow", "outline"] as const;
+export type Surface = (typeof SURFACES)[number];
+
 export interface ThemeConfig {
   paletteId: string;
   radius: RadiusStyle;
   buttonStyle: ButtonStyle;
   typeStyle: TypeStyle;
   animationStyle: AnimationStyle;
+  backdrop?: Backdrop;
+  surface?: Surface;
 }
 
 /* ── Content (one shape per section; every variant of a section shares it) ───── */

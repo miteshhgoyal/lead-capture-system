@@ -55,7 +55,7 @@ export function Offer1({ content }: OfferProps) {
 /** Variant 2: copy and button on the left, the checklist in a card on the right. */
 export function Offer2({ content }: OfferProps) {
   return (
-    <Section id="offer" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="offer" className="rt-tint py-16 lg:py-24">
       <Container>
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>

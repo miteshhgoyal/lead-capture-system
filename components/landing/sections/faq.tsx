@@ -61,7 +61,7 @@ export function Faq1(props: FaqProps) {
   const { content } = props;
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <Section id="faq" className="bg-bg-alt/30 py-16 lg:py-24">
+    <Section id="faq" className="rt-tint py-16 lg:py-24">
       <Container size="md">
         <SectionHeader eyebrow={content.eyebrow} title={content.title} subtitle={content.subtitle} />
         <div className="mt-10 space-y-3">
@@ -113,7 +113,7 @@ export function Faq3(props: FaqProps) {
       return next;
     });
   return (
-    <Section id="faq" className="bg-bg-alt/40 py-16 lg:py-24">
+    <Section id="faq" className="rt-tint py-16 lg:py-24">
       <Container>
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">

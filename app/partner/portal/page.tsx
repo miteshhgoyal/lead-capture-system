@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { AlertTriangle, IndianRupee, Percent, TrendingUp, UserCheck, Users, CalendarDays, CalendarRange } from "lucide-react";
+import { AlertTriangle, BellRing, IndianRupee, Percent, TrendingUp, UserCheck, Users, CalendarDays, CalendarRange } from "lucide-react";
 import { dbConnect } from "@/lib/db";
 import { Lead } from "@/lib/models/Lead";
+import { countPendingApprovals } from "@/lib/telegram/deliveries";
 import { getPartnerSession } from "@/lib/partner-auth";
 import { getPartnerRevenue, partnerLeadMatch, shareOf } from "@/lib/partner-revenue";
 import { maskEmail, maskPhone } from "@/lib/mask";
@@ -27,12 +28,13 @@ export default async function PartnerDashboardPage() {
   startOfToday.setHours(0, 0, 0, 0);
   const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000);
 
-  const [revenue, total, today, week, recent] = await Promise.all([
+  const [revenue, total, today, week, recent, pendingTelegram] = await Promise.all([
     getPartnerRevenue(partner),
     Lead.countDocuments(match),
     Lead.countDocuments({ $and: [match, { createdAt: { $gte: startOfToday } }] } as never),
     Lead.countDocuments({ $and: [match, { createdAt: { $gte: weekAgo } }] } as never),
     Lead.find(match).select("name phone email status createdAt").sort({ createdAt: -1 }).limit(6).lean(),
+    countPendingApprovals(partner._id),
   ]);
 
   const percent = partner.sharePercent ?? 0;
@@ -41,6 +43,20 @@ export default async function PartnerDashboardPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader title={`Welcome, ${partner.name}`} description="Your leads and the revenue they brought in." />
+
+      {pendingTelegram > 0 && (
+        <Link href="/partner/portal/telegram" className="block">
+          <Card className="flex items-center justify-between gap-3 border-gold/30 p-5">
+            <div className="flex items-center gap-3">
+              <BellRing className="size-5 shrink-0 text-[#f2b33d]" aria-hidden />
+              <p className="font-semibold text-ink">
+                {pendingTelegram === 1 ? "1 Telegram message is" : `${pendingTelegram} Telegram messages are`} waiting for your approval
+              </p>
+            </div>
+            <span className="text-cell font-semibold text-accent">Review →</span>
+          </Card>
+        </Link>
+      )}
 
       <ShareLinkCard slug={partner.slug} />
 

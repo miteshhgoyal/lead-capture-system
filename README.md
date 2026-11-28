@@ -132,6 +132,10 @@ Every partner gets their own randomized landing page, generated **once** and sav
 - **Testimonials**: the section renders only a partner's own testimonials (add them in the partner form). It is skipped while the list is empty. No testimonial copy is invented.
 - **Animations**: CSS + IntersectionObserver (`components/landing/motion`), selected by `themeConfig.animationStyle` through `useAnimationPreset()`: `soft-fade`, `bold-slide`, `typewriter`, `blur-stagger` (`none` for legacy pages). `prefers-reduced-motion` disables all motion.
 
+## Partner Telegram Message Preview
+
+In the partner portal's Telegram settings, partners can enter a sample message and preview it in their selected message style before saving that style. These previews are temporary: the sample and result are not saved or sent to a Telegram group. Preview generation is limited to 10 requests per partner per hour.
+
 ### Commands
 
 ```bash

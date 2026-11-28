@@ -26,6 +26,8 @@ export async function PATCH(req: Request): Promise<Response> {
   if (d.tagline !== undefined) partner.tagline = d.tagline;
   if (d.mentorBio !== undefined) partner.mentorBio = d.mentorBio;
   if (d.logoUrl !== undefined) partner.logoUrl = d.logoUrl;
+  if (d.style !== undefined) partner.style = d.style;
+  if (d.telegramAutoApprove !== undefined) partner.telegramAutoApprove = d.telegramAutoApprove;
   if (d.primaryColor !== undefined) partner.theme = { primaryColor: d.primaryColor };
 
   let newHash: string | undefined;

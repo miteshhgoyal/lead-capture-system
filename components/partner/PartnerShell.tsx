@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { LayoutDashboard, LogOut, MessageCircle, Palette, Users, KeyRound, ExternalLink, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, MessageCircle, Palette, Send, Users, KeyRound, ExternalLink, Menu } from "lucide-react";
 import { ToastProvider } from "@/components/admin/Toast";
 import { SiteLogo } from "@/components/ui/SiteLogo";
 import { useThemeMode } from "@/components/theme-mode";
@@ -12,6 +12,7 @@ const NAV = [
   { href: "/partner/portal", label: "Dashboard", Icon: LayoutDashboard },
   { href: "/partner/portal/leads", label: "My Leads", Icon: Users },
   { href: "/partner/portal/my-page", label: "My Page", Icon: Palette },
+  { href: "/partner/portal/telegram", label: "Telegram", Icon: Send },
   { href: "/partner/portal/account", label: "Account", Icon: KeyRound },
 ];
 

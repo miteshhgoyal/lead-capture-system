@@ -54,6 +54,8 @@ export const PartnerSelfUpdateSchema = z
   .object({
     name: PartnerSchema.shape.name,
     ...profileFields,
+    style: z.string().trim().min(1, "Pick a style").max(300, "Style can be at most 300 characters"),
+    telegramAutoApprove: z.boolean(),
     currentPassword: z.string().max(100).optional(),
     newPassword: passwordSchema.optional(),
   })

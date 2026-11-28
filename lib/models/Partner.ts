@@ -37,6 +37,10 @@ export interface IPartner {
   /** Business share (0-100) of the revenue from this partner's leads. Admin-only: no partner-facing route writes it. */
   sharePercent?: number;
   loginId?: string;
+  /** Tone the Telegram bot rewrites broadcasts in (a preset from lib/telegram/styles.ts or custom text, max 300 chars). */
+  style?: string;
+  /** Partner has opted to auto-post future Telegram previews after reviewing and enabling the option. */
+  telegramAutoApprove?: boolean;
   /** scrypt hash (salt:key). Never selected by default: use `.select("+passwordHash")`. */
   passwordHash?: string;
   createdAt: Date;
@@ -86,6 +90,8 @@ const partnerSchema = new Schema<IPartner>(
     createdBy: { type: String, trim: true },
     sharePercent: { type: Number, default: 0, min: 0, max: 100 },
     loginId: { type: String, lowercase: true, trim: true },
+    style: { type: String, trim: true, maxlength: 300, default: "Hinglish casual" },
+    telegramAutoApprove: { type: Boolean, default: false },
     passwordHash: { type: String, select: false },
   },
   {
